@@ -1,0 +1,47 @@
+
+{% extends 'instrumentos/base.html' %}
+
+{% block contenido %}
+
+<section class="seccion-formulario">
+
+    <div class="panel-formulario">
+
+        <p class="subtitulo">
+            JORGE'S MUSIC HOME
+        </p>
+
+        <h1>Nuevo instrumento</h1>
+
+        <p class="descripcion-formulario">
+            Registra un nuevo instrumento en
+            nuestro inventario musical.
+        </p>
+
+        <form method="POST"
+              action="{% url 'instrumentos:crear' %}">
+
+            {% csrf_token %}
+
+            {% include 'instrumentos/_campos_formulario.html' %}
+
+            <div class="botones-formulario">
+
+                <button type="submit" class="boton">
+                    Guardar instrumento
+                </button>
+
+                <a href="{% url 'instrumentos:lista' %}"
+                   class="boton-secundario">
+                    Cancelar
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

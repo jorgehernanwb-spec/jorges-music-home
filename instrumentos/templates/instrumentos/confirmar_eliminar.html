@@ -1,0 +1,22 @@
+{% extends 'instrumentos/base.html' %}
+
+{% block contenido %}
+<section class="seccion-formulario" aria-labelledby="titulo-eliminar">
+    <div class="panel-formulario panel-instrumento panel-eliminar">
+        <p class="subtitulo">INVENTARIO</p>
+        <h1 id="titulo-eliminar">Eliminar instrumento</h1>
+        <p class="descripcion-formulario">
+            ¿Quieres eliminar <strong>{{ instrumento.nombre }}</strong> del inventario?
+            Esta acción es permanente.
+        </p>
+
+        <form method="post" action="{% url 'instrumentos:eliminar' instrumento.pk %}">
+            {% csrf_token %}
+            <div class="botones-formulario">
+                <a class="boton-secundario" href="{% url 'instrumentos:lista' %}">Cancelar</a>
+                <button type="submit" class="boton boton-eliminar">Confirmar eliminación</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

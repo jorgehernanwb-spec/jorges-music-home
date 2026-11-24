@@ -1,0 +1,8 @@
+# Dependencias directas
+Django==5.0.14
+mysqlclient==2.2.8
+
+# Dependencias transitivas de Django fijadas para reproducir el entorno.
+asgiref==3.13.0
+sqlparse==0.6.1
+tzdata==2026.6; sys_platform == "win32"

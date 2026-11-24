@@ -1,0 +1,91 @@
+
+{% extends 'instrumentos/base.html' %}
+{% load instrumentos_formato %}
+
+{% block contenido %}
+
+<section class="presentacion">
+    <p class="subtitulo">WELCOME TO THE MUSIC HOUSE</p>
+    <h1>Descubre tu próximo sonido</h1>
+    <p>
+        Explora nuestra colección de instrumentos
+        musicales en un ambiente único.
+    </p>
+    <a href="{% url 'instrumentos:crear' %}"
+       class="boton">
+        + Registrar instrumento
+    </a>
+</section>
+
+<section class="catalogo">
+    <div class="titulo-seccion">
+        <div>
+            <p class="subtitulo">NUESTRA COLECCIÓN</p>
+            <h2>Instrumentos musicales</h2>
+        </div>
+        <span>{{ instrumentos|length }} registrados</span>
+    </div>
+
+    <div class="grid-instrumentos">
+        {% for instrumento in instrumentos %}
+            <article class="tarjeta">
+                <div class="tarjeta-imagen">
+                    <span class="simbolo">♫</span>
+                </div>
+
+                <div class="tarjeta-contenido">
+                    <p class="categoria">
+                        {{ instrumento.get_categoria_display }}
+                    </p>
+
+                    <h3>{{ instrumento.nombre }}</h3>
+                    <p class="marca-instrumento">
+                        {{ instrumento.marca }}
+                    </p>
+
+                    <p class="precio">
+                        {{ instrumento.precio|clp }} CLP
+                    </p>
+
+                    {% if instrumento.stock == 0 %}
+                        <p class="agotado">Sin stock</p>
+                    {% elif instrumento.stock <= 2 %}
+                        <p class="stock-bajo">
+                            Stock bajo ({{ instrumento.stock }})
+                        </p>
+                    {% else %}
+                        <p class="disponible">
+                            Disponible ({{ instrumento.stock }})
+                        </p>
+                    {% endif %}
+
+                    <div class="acciones">
+                        <a href="{% url 'instrumentos:detalle' instrumento.pk %}">
+                            Ver
+                        </a>
+                        <a href="{% url 'instrumentos:editar' instrumento.pk %}">
+                            Editar
+                        </a>
+                        <a href="{% url 'instrumentos:eliminar' instrumento.pk %}">
+                            Eliminar
+                        </a>
+                    </div>
+                </div>
+            </article>
+        {% empty %}
+            <div class="sin-registros">
+                <h3>Aún no hay instrumentos registrados</h3>
+                <p>
+                    Comienza agregando el primer instrumento
+                    a nuestra tienda.
+                </p>
+                <a href="{% url 'instrumentos:crear' %}"
+                   class="boton">
+                    Registrar instrumento
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,64 @@
+# Entornos y artefactos de Python
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Configuración privada y credenciales
+.env
+.env.*
+!.env.example
+*.env
+*.local
+*credentials*.json
+*secret*.json
+local_settings.py
+*.pem
+*.key
+*.pfx
+*.p12
+.netrc
+.aws/
+.ssh/
+
+# Material personal de preparación para la defensa
+/docs/08_defensa/
+/defensa_privada/
+
+# Bases locales y respaldos
+*.sqlite*
+*.db
+*.sql
+*.sql.*
+*.dump
+*.bak
+*.backup
+backups/
+respaldos/
+
+# IDE, herramientas y archivos locales de Windows
+.vscode/
+*.code-workspace
+.idea/
+.codex/
+.agents/
+.history/
+node_modules/
+Thumbs.db
+Desktop.ini
+*.log
+*.tmp
+*.temp
+*.swp
+*~
+~$*

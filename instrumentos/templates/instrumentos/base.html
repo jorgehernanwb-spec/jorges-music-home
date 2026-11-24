@@ -1,0 +1,48 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JORGE'S MUSIC HOME</title>
+
+    <link rel="stylesheet"
+          href="{% static 'instrumentos/css/styles.css' %}">
+</head>
+
+<body>
+    <header class="encabezado">
+        <a href="{% url 'instrumentos:inicio' %}" class="marca">
+            JORGE'S <span>MUSIC HOME</span>
+        </a>
+
+        <nav aria-label="Navegación principal">
+            <a href="{% url 'instrumentos:lista' %}">
+                Instrumentos
+            </a>
+            <a href="{% url 'instrumentos:crear' %}">
+                Nuevo instrumento
+            </a>
+        </nav>
+    </header>
+
+    <main class="contenido">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mensaje" role="status">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block contenido %}
+        {% endblock %}
+    </main>
+
+    <footer class="pie">
+        <p>JORGE'S MUSIC HOME · EST. 2026</p>
+        <p>Donde la música encuentra su hogar.</p>
+    </footer>
+</body>
+</html>

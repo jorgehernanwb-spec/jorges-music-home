@@ -1,0 +1,21 @@
+{% extends 'instrumentos/base.html' %}
+
+{% block contenido %}
+<section class="seccion-formulario" aria-labelledby="titulo-editar">
+    <div class="panel-formulario panel-instrumento">
+        <p class="subtitulo">INVENTARIO</p>
+        <h1 id="titulo-editar">Editar instrumento</h1>
+        <p class="descripcion-formulario">Actualiza los datos de la ficha del instrumento.</p>
+
+        <form method="post" action="{% url 'instrumentos:editar' instrumento.pk %}">
+            {% csrf_token %}
+            {% include 'instrumentos/_campos_formulario.html' %}
+
+            <div class="botones-formulario">
+                <button type="submit" class="boton">Guardar cambios</button>
+                <a class="boton-secundario" href="{% url 'instrumentos:detalle' instrumento.pk %}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
