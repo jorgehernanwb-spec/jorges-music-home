@@ -1,0 +1,26 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titulo %}Mundo musical{% endblock %} · JORGE'S MUSIC HOME</title>
+    <link rel="stylesheet" href="{% static 'instrumentos/css/pie-global.css' %}">
+    <link rel="stylesheet" href="{% static 'instrumentos/css/mundo-musical.css' %}">
+</head>
+<body class="pagina-con-pie mundo">
+    <header class="mundo-cabecera">
+        <a class="mundo-marca" href="{% url 'instrumentos:recepcion' %}">JORGE'S <span>MUSIC HOME</span></a>
+        <nav aria-label="Navegación principal">
+            <a href="{% url 'instrumentos:recepcion' %}">Recepción</a>
+            <a href="{% url 'instrumentos:coleccion' %}">Instrumentos</a>
+            <a href="{% url 'instrumentos:lista' %}">Inventario</a>
+            <a href="{% url 'instrumentos:mundo_musical' %}"{% if not articulo %} aria-current="page"{% endif %}>Mundo musical</a>
+        </nav>
+    </header>
+    <main class="mundo-principal">
+        {% block contenido %}{% endblock %}
+    </main>
+    {% include 'instrumentos/pie_global.html' %}
+</body>
+</html>

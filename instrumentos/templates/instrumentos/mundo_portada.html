@@ -1,0 +1,17 @@
+{% extends 'instrumentos/mundo_base.html' %}
+{% block contenido %}
+<h1>Mundo musical</h1>
+<ul class="mundo-tarjetas" aria-label="Artículos de Mundo musical">
+    {% for articulo in articulos %}
+        <li>
+            <a class="mundo-tarjeta" href="{% url 'instrumentos:mundo_articulo' articulo.slug %}">
+                {% include 'instrumentos/mundo_imagen.html' with articulo=articulo only %}
+                <div class="mundo-rotulo">
+                    <span>{{ articulo.tema }}</span>
+                    <h2>{{ articulo.titulo }}</h2>
+                </div>
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

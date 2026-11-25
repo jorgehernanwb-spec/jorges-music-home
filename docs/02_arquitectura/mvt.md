@@ -21,7 +21,8 @@
 | `/coleccion/` | `coleccion` | Muestra las cuatro vitrinas con los nombres del modelo. |
 | `/coleccion/<slug:categoria>/` | `coleccion_categoria` | GET y HEAD muestran la sala y sus registros actuales. Las cuatro salas comparten visor y carrusel. Un slug desconocido devuelve 404. |
 | `/coleccion/instrumento/<int:pk>/` | `coleccion_instrumento` | Consulta la categoría vigente y redirige a su sala con `?instrumento=<id>`. Si el registro ya no existe, vuelve a las categorías. |
-| `/mundo-musical/` | `mundo_musical` | Entrada de la sección educativa en preparación. |
+| `/mundo-musical/` | `mundo_musical` | Portada editorial de doce artículos fijos. |
+| `/mundo-musical/<slug>/` | `mundo_articulo` | Lectura por identificador. Un artículo inexistente devuelve 404. |
 | `/instrumentos/` | `lista` | El GET muestra los instrumentos ordenados por nombre. |
 | `/instrumentos/nuevo/` | `crear` | El GET muestra el formulario vacío. El POST intenta crear el instrumento. |
 | `/instrumentos/<int:pk>/` | `detalle` | El GET muestra la ficha. Un identificador inexistente devuelve 404. |
@@ -31,6 +32,8 @@
 En lectura, el inventario ordena por nombre y clave primaria y puede filtrar por búsqueda, categoría y stock. `get_object_or_404(Instrumento, pk=pk)` obtiene la fila de la ficha, edición o borrado. La vista de exhibición traduce el slug a una clave interna (por ejemplo, `baterias` a `Percusion`) y filtra por categoría. Django crea las fichas HTML y obtiene el acabado desde `presentacion.py`. El carrusel cambia de registro en el navegador. Three.js y GLTFLoader cargan un GLB estático por sala y reutilizan su escena para todos los registros. [Recursos 3D](recursos_3d.md)
 
 Django traduce el identificador solicitado a la posición inicial del carrusel dentro de la consulta ordenada. La plantilla entrega esa posición junto con las fichas. Se representa una pieza por registro y el stock se presenta como dato de la ficha.
+
+Mundo musical usa vistas de lectura en `mundo_musical.py`, un conjunto editorial versionado en `contenido_musical.py` y plantillas propias. Estas rutas sirven texto e imágenes estáticas y no consultan MariaDB. [Caso de uso y fuentes](../04_casos_de_uso/mundo_musical.md)
 
 En alta, la vista construye `InstrumentoForm(request.POST)`. En edición, usa `InstrumentoForm(request.POST, instance=instrumento)`, de modo que `save()` actualice la fila seleccionada. Ambas ramas llaman a `is_valid()` antes de guardar. Un formulario inválido vuelve a la misma pantalla con sus errores. Si el guardado tiene éxito, Django registra un mensaje con `messages.success()` y redirige a `instrumentos:lista`.
 

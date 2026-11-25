@@ -20,12 +20,17 @@ flowchart LR
         rutas["URLs del proyecto y de instrumentos"]
         vistas["Funciones de views.py"]
         galeria["Funciones de galeria.py"]
+        mundo["Vistas de Mundo musical"]
+        articulos["Artículos editoriales versionados"]
         formulario["InstrumentoForm"]
         modelo["Modelo Instrumento"]
         orm["ORM de Django"]
         plantillas["Templates HTML"]
         rutas -->|Despacha| vistas
         rutas -->|"Portada y salas"| galeria
+        rutas -->|"Portada y lectura"| mundo
+        mundo -->|"Lee contenido fijo"| articulos
+        mundo -->|"Artículo o portada"| plantillas
         galeria -->|"Lee por categoría"| modelo
         galeria -->|"Vitrinas y datos de la sala"| plantillas
         vistas -->|Alta y edición| formulario

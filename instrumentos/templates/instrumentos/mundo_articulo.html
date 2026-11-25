@@ -1,0 +1,28 @@
+{% extends 'instrumentos/mundo_base.html' %}
+{% block titulo %}{{ articulo.titulo }}{% endblock %}
+{% block contenido %}
+<div class="mundo-encabezado-articulo">
+    <a class="mundo-volver" href="{% url 'instrumentos:mundo_musical' %}">Volver a Mundo Musical</a>
+    <h1 id="mundo-titulo">{{ articulo.titulo }}</h1>
+</div>
+<article class="mundo-lectura" tabindex="0" aria-labelledby="mundo-titulo">
+    <figure class="mundo-portadilla">
+        {% include 'instrumentos/mundo_imagen.html' with articulo=articulo only %}
+        <figcaption>Ilustración editorial generada para este artículo.</figcaption>
+    </figure>
+    <div class="mundo-prosa">
+        <p class="mundo-entrada">{{ articulo.entrada }}</p>
+        {% for subtitulo, parrafos in articulo.secciones %}
+            <section>
+                <h2>{{ subtitulo }}</h2>
+                {% for parrafo in parrafos %}<p>{{ parrafo }}</p>{% endfor %}
+            </section>
+        {% endfor %}
+        <p class="mundo-cierre">{{ articulo.cierre }}</p>
+        <section>
+            <h2>Fuentes</h2>
+            <ul>{% for nombre, url in articulo.fuentes %}<li><a href="{{ url }}">{{ nombre }}</a></li>{% endfor %}</ul>
+        </section>
+    </div>
+</article>
+{% endblock %}

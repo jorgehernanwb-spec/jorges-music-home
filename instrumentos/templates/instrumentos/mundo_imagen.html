@@ -1,0 +1,6 @@
+{% load static %}
+<div class="mundo-imagen">
+    {% with ruta='instrumentos/img/mundo/'|add:articulo.slug|add:'.jpg' %}
+        <img src="{% static ruta %}" alt="{{ articulo.imagen }}" width="380" height="337">
+    {% endwith %}
+</div>

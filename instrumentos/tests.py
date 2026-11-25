@@ -91,14 +91,54 @@ class RecepcionTests(SimpleTestCase):
         destino = reverse("instrumentos:mundo_musical")
         response = self.client.get(destino)
         self.assertContains(response, "<h1>Mundo musical</h1>", html=True)
-        self.assertRegex(
-            response.content.decode(),
-            rf'(?s)<a href="{destino}" aria-current="page">\s*<svg[^>]*>.*?</svg>\s*Mundo musical</a>',
-        )
+        self.assertContains(response, f'<a href="{destino}" aria-current="page">Mundo musical</a>', html=True)
         self.assertContains(
-            response, f'<a class="recepcion-control" href="{reverse("instrumentos:recepcion")}">Inicio</a>',
+            response, f'<a href="{reverse("instrumentos:recepcion")}">Recepción</a>',
             html=True,
         )
+
+
+class MundoMusicalTests(SimpleTestCase):
+    def test_portada_tiene_doce_enlaces_nativos_y_cuatro_articulos_por_tema(self):
+        from .contenido_musical import ARTICULOS
+
+        portada = self.client.get(reverse("instrumentos:mundo_musical"))
+        self.assertContains(portada, 'class="mundo-tarjeta"', count=12)
+        self.assertEqual(Counter(pieza.tema for pieza in ARTICULOS.values()), {
+            "Instrumentos": 4, "Historia y acontecimientos": 4, "Tecnología y curiosidades": 4,
+        })
+        for slug, pieza in ARTICULOS.items():
+            ruta = reverse("instrumentos:mundo_articulo", args=[slug])
+            self.assertContains(portada, f'<a class="mundo-tarjeta" href="{ruta}">')
+            imagen = f"instrumentos/img/mundo/{slug}.jpg"
+            self.assertContains(portada, imagen)
+            self.assertIsNotNone(finders.find(imagen))
+            self.assertContains(portada, pieza.titulo)
+        self.assertContains(portada, 'class="pie-global"', count=1)
+
+    def test_cada_articulo_abre_su_contenido_fuentes_y_enlace_de_regreso(self):
+        temas = {
+            "guitarra": "Antonio de Torres", "bajo": "Precision Bass", "teclado": "octava",
+            "bateria": "charles", "fonografo": "John Kruesi", "vinilo": "33⅓",
+            "woodstock": "Bethel", "hip-hop": "Kool Herc", "walkman": "TPS-L2",
+            "midi": "Note On", "gusanos-musicales": "Jakubowski", "la-440": "880 Hz",
+        }
+        raiz = reverse("instrumentos:mundo_musical")
+        for slug, texto in temas.items():
+            with self.subTest(slug=slug):
+                respuesta = self.client.get(reverse("instrumentos:mundo_articulo", args=[slug]))
+                self.assertContains(respuesta, texto)
+                self.assertContains(respuesta, "<h2>Fuentes</h2>", html=True)
+                self.assertContains(respuesta, 'tabindex="0" aria-labelledby="mundo-titulo"')
+                self.assertContains(respuesta, f'<a class="mundo-volver" href="{raiz}">Volver a Mundo Musical</a>', html=True)
+                self.assertContains(respuesta, 'class="pie-global"', count=1)
+                self.assertNotContains(respuesta, 'class="mundo-tarjeta"')
+        self.assertContains(self.client.get(raiz), 'class="mundo-tarjeta"', count=12)
+
+    def test_articulo_desconocido_y_metodos_de_escritura(self):
+        raiz = reverse("instrumentos:mundo_musical")
+        self.assertEqual(self.client.get(f"{raiz}no-existe/").status_code, 404)
+        self.assertEqual(self.client.post(f"{raiz}guitarra/").status_code, 405)
 
 
 class GaleriaCategoriasTests(SimpleTestCase):

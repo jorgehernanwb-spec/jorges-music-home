@@ -32,4 +32,8 @@ La ficha de Inventario tiene cobertura en las cuatro categorías con una plantil
 | Cuatro salas y cambios del CRUD | Django comprueba las cuatro categorías y que agregar un quinto registro, editar su marca y eliminarlo se refleje en su sala. Node verifica los cinco acabados únicamente en los nodos autorizados. Khronos glTF Validator revisa la conformidad de los cuatro GLB. |
 | Acceso directo desde Inventario | Django comprueba enlaces en el listado y en detalle, redirección por ID vigente, cambio de categoría, datos editados, agotados, eliminados e IDs ajenos o no válidos. Node verifica que el visor y el diálogo se inicialicen en la selección solicitada. |
 
+## Mundo musical
+
+Django comprueba la entrada del menú, los doce enlaces nativos, cuatro artículos por tema, la existencia de sus imágenes, el contenido distintivo de cada artículo, el área de lectura enfocable, el regreso, el pie único, el 404 y el rechazo de POST. Estas pruebas usan `SimpleTestCase` porque las vistas editoriales no consultan MariaDB. La cuadrícula, el foco visible y el desplazamiento interno se revisan en Edge, según el [caso de uso](../04_casos_de_uso/mundo_musical.md).
+
 La revisión de distribución en escritorio y móvil, de foco visible y de rotación renderizada se realiza siguiendo el [caso de uso de la galería](../04_casos_de_uso/galeria.md).
