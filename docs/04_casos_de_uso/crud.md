@@ -49,8 +49,8 @@ El **operador del inventario** utiliza el navegador con Django y MariaDB disponi
 | Campo | Regla |
 | --- | --- |
 | Nombre | Obligatorio, de 2 a 20 caracteres después de normalizar espacios. Admite letras, incluidas tildes y ñ, espacios y guiones. Debe contener al menos una letra. |
-| Marca | Obligatoria. Una de 13 opciones predefinidas. |
-| Categoría | Obligatoria. Una de seis opciones predefinidas. |
+| Marca | Obligatoria. Una de cinco opciones predefinidas. |
+| Categoría | Obligatoria. Una de cuatro opciones predefinidas. |
 | Precio | Obligatorio. Entero de $1 a $999.999 CLP y hasta seis dígitos. `$100.000` se almacena como el entero `100000`. |
 | Stock | Obligatorio. Entero de 0 a 999 con hasta tres dígitos. |
 | Descripción | Opcional, hasta 100 caracteres. |

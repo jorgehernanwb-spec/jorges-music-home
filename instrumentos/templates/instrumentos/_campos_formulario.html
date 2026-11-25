@@ -1,26 +1,35 @@
 {% load static %}
 
 {% if formulario.non_field_errors %}
-    <div class="errores">{{ formulario.non_field_errors }}</div>
+    <div class="errores" role="alert">{{ formulario.non_field_errors }}</div>
 {% endif %}
 
-{% for campo in formulario %}
-    <div class="grupo-campo">
-        <label for="{{ campo.id_for_label }}">
-            {{ campo.label }}
-            <span class="requisito-campo">({% if campo.field.required %}obligatorio{% else %}opcional{% endif %})</span>
-        </label>
-        {{ campo }}
-        <p class="errores" id="{{ campo.auto_id }}_aviso" aria-live="polite" hidden></p>
-        {% if campo.errors %}
-            <div class="errores">{{ campo.errors }}</div>
-        {% endif %}
-        {% if campo.help_text %}
-            <small id="{{ campo.auto_id }}_helptext">{{ campo.help_text }}</small>
-        {% endif %}
-        {% if campo.name == 'descripcion' %}
-            <small id="{{ campo.auto_id }}_contador" hidden></small>
-        {% endif %}
-    </div>
-{% endfor %}
+<div class="campos-formulario">
+    {% for campo in formulario %}
+        <div class="grupo-campo{% if campo.name == 'descripcion' %} grupo-campo--ancho{% endif %}"{% if campo.errors %}
+             role="group" aria-describedby="{{ campo.auto_id }}_errores"{% endif %}>
+            <label for="{{ campo.id_for_label }}">
+                {{ campo.label }}
+                <span class="requisito-campo">({% if campo.field.required %}obligatorio{% else %}opcional{% endif %})</span>
+            </label>
+            {{ campo }}
+            {% if campo.name == 'marca' and colores_marca %}
+                <small class="acabado-marca" id="acabado-marca"{% if not color_marca %} hidden{% endif %}>
+                    <span aria-hidden="true"{% if color_marca %} style="--acabado: {{ color_marca }}"{% endif %}></span>
+                    Acabado de la marca
+                </small>
+            {% endif %}
+            <p class="errores" id="{{ campo.auto_id }}_aviso" aria-live="polite" hidden></p>
+            {% if campo.errors %}
+                <div class="errores" id="{{ campo.auto_id }}_errores">{{ campo.errors }}</div>
+            {% endif %}
+            {% if campo.help_text %}
+                <small id="{{ campo.auto_id }}_helptext">{{ campo.help_text }}</small>
+            {% endif %}
+            {% if campo.name == 'descripcion' %}
+                <small id="{{ campo.auto_id }}_contador" hidden></small>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
 <script src="{% static 'instrumentos/js/validaciones.js' %}?v=2" defer></script>

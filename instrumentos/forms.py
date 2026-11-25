@@ -40,6 +40,7 @@ class InstrumentoForm(forms.ModelForm):
         label="Nombre",
         widget=forms.TextInput(attrs={
             "placeholder": "Ej. Bajo Precision",
+            "minlength": NOMBRE_MIN,
             "maxlength": NOMBRE_MAX,
             "data-nombre-min": NOMBRE_MIN,
             "data-nombre-max": NOMBRE_MAX,

@@ -1,15 +1,30 @@
 {% extends 'instrumentos/base.html' %}
+{% load static %}
+{% block clase_pagina %} pagina-showroom{% endblock %}
 
 {% block contenido %}
-<section class="seccion-formulario" aria-labelledby="titulo-editar">
+<section class="seccion-formulario seccion-formulario--crud" aria-labelledby="titulo-editar">
     <div class="panel-formulario panel-instrumento">
-        <p class="subtitulo">INVENTARIO</p>
-        <h1 id="titulo-editar">Editar instrumento</h1>
-        <p class="descripcion-formulario">Actualiza los datos de la ficha del instrumento.</p>
+        <div class="cabecera-formulario">
+            {% include 'instrumentos/recepcion_icono.html' with icono='disco' only %}
+            <h1 id="titulo-editar">Editar instrumento</h1>
+            <div class="ficha-showroom">
+                <p>Instrumento seleccionado: <strong>{{ formulario.initial.nombre }}</strong></p>
+                <dl class="datos-showroom">
+                    <div><dt>Marca</dt><dd>{{ formulario.initial.marca }}</dd></div>
+                    <div>
+                        <dt>Categoría</dt>
+                        <dd>{% for valor, etiqueta in formulario.fields.categoria.choices %}{% if valor == formulario.initial.categoria %}{{ etiqueta }}{% endif %}{% endfor %}</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
 
         <form method="post" action="{% url 'instrumentos:editar' instrumento.pk %}">
             {% csrf_token %}
             {% include 'instrumentos/_campos_formulario.html' %}
+            {{ colores_marca|json_script:"colores-marca" }}
+            <script src="{% static 'instrumentos/js/acabado-marca.js' %}" defer></script>
 
             <div class="botones-formulario">
                 <button type="submit" class="boton">Guardar cambios</button>
