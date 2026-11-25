@@ -10,6 +10,9 @@
 <header class="galeria-titulo">
     <h1>{{ titulo }}</h1>
 </header>
+{% if seleccion_invalida and acabados %}
+    <p class="galeria-aviso" role="status">El instrumento solicitado no está en esta sala. Se muestra el primero de la colección.</p>
+{% endif %}
 {% if acabados %}
     {% include 'instrumentos/galeria_carrusel.html' %}
 {% else %}

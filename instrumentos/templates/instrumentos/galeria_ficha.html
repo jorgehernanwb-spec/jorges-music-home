@@ -5,7 +5,7 @@
         <div><dt>Marca</dt><dd>{{ instrumento.get_marca_display }}</dd></div>
         <div><dt>Categoría</dt><dd>{{ instrumento.get_categoria_display }}</dd></div>
         <div><dt>Precio</dt><dd>{{ instrumento.precio|clp }} CLP</dd></div>
-        <div><dt>Stock</dt><dd>{{ instrumento.stock }} unidades</dd></div>
+        <div><dt>Stock</dt><dd>{% if instrumento.stock == 0 %}Sin stock{% else %}{{ instrumento.stock }} unidades{% endif %}</dd></div>
         <div>
             <dt>Acabado</dt>
             <dd>{% if color %}<span class="galeria-muestra" style="--acabado: {{ color }}" aria-hidden="true"></span>

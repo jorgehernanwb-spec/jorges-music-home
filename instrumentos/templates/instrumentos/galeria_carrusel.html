@@ -1,4 +1,5 @@
-<section class="galeria-carrusel" aria-label="Exhibición de {{ titulo }}" data-carrusel data-categoria="{{ categoria }}">
+<section class="galeria-carrusel" aria-label="Exhibición de {{ titulo }}" data-carrusel
+         data-categoria="{{ categoria }}" data-indice="{{ indice_inicial }}">
     <p class="galeria-posicion" data-posicion role="status" aria-atomic="true" hidden></p>
     <div class="galeria-escena" data-escena hidden>
         <button class="galeria-flecha galeria-flecha--anterior" type="button" data-paso="-1"
@@ -29,8 +30,8 @@
     </dialog>
     <ul class="galeria-instrumentos galeria-registros" data-fichas>
         {% for pieza in acabados %}
-            <li data-acabado="{{ pieza.color }}">
-                <details>
+            <li data-acabado="{{ pieza.color }}" data-identidad="{{ pieza.instrumento.nombre }} · {{ pieza.instrumento.get_marca_display }}{% if pieza.instrumento.stock == 0 %} · Sin stock{% endif %}">
+                <details{% if seleccion_directa and forloop.counter0 == indice_inicial %} open{% endif %}>
                     <summary>{{ pieza.instrumento.nombre }} · {{ pieza.instrumento.get_marca_display }}</summary>
                     {% include 'instrumentos/galeria_ficha.html' with instrumento=pieza.instrumento color=pieza.color only %}
                 </details>

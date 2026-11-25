@@ -23,6 +23,7 @@ urlpatterns = [
         name="coleccion",
     ),
     path("coleccion/<slug:categoria>/", galeria.exhibicion, name="coleccion_categoria"),
+    path("coleccion/instrumento/<int:pk>/", galeria.abrir_instrumento, name="coleccion_instrumento"),
     path(
         "mundo-musical/",
         TemplateView.as_view(

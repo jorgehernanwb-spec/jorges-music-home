@@ -99,4 +99,6 @@ La rama `feature/galeria-3d` parte del inventario vintage (`00440612826423e47646
 
 Desde **Instrumentos** en la recepción se accede a **Nuestra colección**. Las cuatro salas comparten un carrusel circular con registros actuales de MariaDB, giro independiente y diálogo de especificaciones. Cada sala carga un GLB de Innerscene mediante Three.js 0.180.0 servido localmente y aplica el acabado de marca únicamente a las piezas identificadas. Los datos siguen disponibles si falla el recurso, WebGL 2 o JavaScript. [Galería y revisión visual](docs/04_casos_de_uso/galeria.md) · [Modelos, licencias y validación](docs/02_arquitectura/recursos_3d.md)
 
+En el Inventario y su ficha de detalle, **Ver en 3D** abre el registro exacto mediante `/coleccion/instrumento/<id>/`. La URL resuelve la categoría actual, aunque el instrumento cambie de sala. Los registros agotados siguen visibles y muestran **Sin stock**.
+
 Ejecuta la demostración en `127.0.0.1` y usa una base con datos de ejemplo. Esta versión no está preparada para despliegue público. El servidor de desarrollo, el modo de depuración y las acciones de inventario sin inicio de sesión están destinados a la demostración local.

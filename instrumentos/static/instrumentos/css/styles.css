@@ -475,36 +475,153 @@ h1 {
     border-top-color: var(--rojo);
 }
 
+.ficha-premium {
+    --filete: #a87942;
+    --oro-claro: #edc888;
+    position: relative;
+    max-width: 65rem;
+    margin: clamp(1rem, 4vh, 2.5rem) auto;
+    width: calc(100% - 1.5rem);
+    padding: clamp(1.4rem, 4vw, 3rem);
+    border: 2px solid #dfad60;
+    border-radius: 1.1rem;
+    background: radial-gradient(ellipse at 10% 0, #69452866, transparent 53%),
+        radial-gradient(ellipse at 52% 100%, #9b531b42, transparent 62%), #1c120d;
+    box-shadow: 0 .3rem 0 #644016, 0 1rem 3rem #0008, inset 0 0 2.5rem #120b07c0;
+    overflow-wrap: anywhere;
+}
+.ficha-premium::before {
+    content: "";
+    position: absolute;
+    inset: .42rem;
+    border: 1px solid #a879426b;
+    border-radius: .76rem;
+    pointer-events: none;
+}
+.ficha-esquinas { position: absolute; inset: .53rem; color: var(--oro-claro); pointer-events: none; }
+.ficha-esquinas span { position: absolute; font: 1.37rem/1 Georgia, serif; }
+.ficha-esquinas span:nth-child(1) { top: 0; left: .15rem; transform: rotate(-45deg); }
+.ficha-esquinas span:nth-child(2) { top: 0; right: .15rem; transform: rotate(45deg); }
+.ficha-esquinas span:nth-child(3) { bottom: 0; left: .15rem; transform: rotate(-135deg); }
+.ficha-esquinas span:nth-child(4) { bottom: 0; right: .15rem; transform: rotate(135deg); }
+.ficha-cabecera { text-align: center; }
+.ficha-musica {
+    display: flex; align-items: center; justify-content: center; gap: .65rem;
+    max-width: 31rem; margin: auto; color: var(--oro-claro);
+}
+.ficha-musica::before, .ficha-musica::after,
+.ficha-disponibilidad::before, .ficha-disponibilidad::after {
+    content: ""; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, #d7a15a);
+}
+.ficha-musica::after, .ficha-disponibilidad::after { transform: scaleX(-1); }
+.ficha-musica .ficha-icono { width: 2.65rem; height: 2.65rem; }
+.ficha-icono { flex: none; vertical-align: middle; }
+.ficha-cabecera h1 {
+    color: #ffedd0;
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 1.08;
+    margin: .32rem 0 .55rem;
+    text-shadow: 0 0 1rem #e5ab6260;
+}
+.ficha-filete {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: .55rem;
+    margin: 0 auto 1.1rem;
+    width: min(100%, 27rem);
+    color: var(--oro-claro);
+    font-size: .67rem;
+}
+.ficha-filete::before, .ficha-filete::after {
+    content: "";
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--filete));
+}
+.ficha-filete::after { transform: scaleX(-1); }
 .ficha-instrumento {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
-    gap: 1px;
-    margin: 24px 0;
-    overflow: hidden;
-    border: 1px solid #80603b;
-    border-radius: 10px;
-    background: #80603b;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(.55rem, 2vw, 1rem);
+    margin: 0;
+    text-align: center;
 }
-
-.ficha-instrumento > div {
-    padding: 14px 18px;
-    background: #21180e;
+.ficha-instrumento > div, .ficha-descripcion {
+    padding: .85rem;
+    border: 1px solid var(--filete);
+    border-radius: .62rem;
+    background: linear-gradient(140deg, #37251a, #1e140f);
+    box-shadow: inset 0 0 0 .2rem #170e0a6b, 0 .35rem .8rem #0004;
 }
-
-.ficha-instrumento dt {
-    color: var(--texto-suave);
+.ficha-instrumento > div:not(.ficha-precio), .ficha-descripcion {
+    position: relative; text-align: left; padding-inline-start: 4.35rem;
 }
-
+.ficha-icono-lateral {
+    position: absolute; inset: 22% auto 22% .7rem; width: 2.95rem;
+    display: grid; place-items: center; border-inline-end: 1px solid #a87942;
+    color: var(--oro-claro);
+}
+.ficha-icono-lateral svg { width: 1.9rem; height: 1.9rem; }
+.ficha-instrumento dt { color: var(--oro-claro); font: 500 clamp(1rem, 2vw, 1.32rem) Georgia, serif; }
 .ficha-instrumento dd {
-    margin: 6px 0 0;
+    margin: .38rem 0 0;
+    font: 600 clamp(1.12rem, 2.5vw, 1.8rem)/1.18 Georgia, serif;
 }
-
-.ficha-descripcion {
-    grid-column: 1 / -1;
+.ficha-instrumento .ficha-precio {
+    background: linear-gradient(140deg, #825323, #4a2d16);
+    border-color: #d9a765;
+    color: #fff0ce;
+    box-shadow: inset 0 0 0 .16rem #eeb7726b, 0 .33rem .8rem #ad621a42;
 }
+.ficha-precio dt { font-style: italic; }
+.ficha-disponibilidad { display: flex; align-items: center; gap: clamp(.5rem, 2vw, 1.25rem); }
+.ficha-stock {
+    width: fit-content;
+    max-width: 100%;
+    margin: .95rem auto;
+    padding: .4rem .9rem;
+    border: 1px solid #c9ab68;
+    border-radius: 2rem;
+    color: #eef2cc;
+    background: #30351e;
+    text-align: center;
+    font-weight: 600;
+}
+.ficha-stock span { margin-right: .28em; color: var(--oro-claro); }
+.ficha-stock--agotado { color: #ffddd1; background: #48251e; border-color: #b7705b; }
+.ficha-descripcion { padding-block: .8rem; padding-inline-end: 1rem; }
+.ficha-descripcion h2 { color: var(--oro-claro); font-size: 1.25rem; font-style: italic; margin: 0 0 .32rem; }
+.ficha-descripcion p { margin: 0; line-height: 1.55; white-space: pre-wrap; }
+.ficha-acciones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .7rem; margin-top: 1rem; }
+.ficha-acciones a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .45rem;
+    min-height: 2.75rem;
+    padding: .45rem .55rem;
+    border: 1px solid var(--filete);
+    border-radius: .85rem;
+    background: #2a1c13;
+    color: #ffdf9f;
+    text-align: center;
+    font: 600 clamp(1rem, 2vw, 1.24rem) Georgia, serif;
+    transition: background .16s, box-shadow .16s;
+}
+.ficha-acciones .ficha-icono { width: 1.45rem; height: 1.45rem; }
+.ficha-acciones a:hover { background: #4d301c; box-shadow: 0 0 .85rem #d58d4a44; }
+.ficha-acciones a:focus-visible { outline: 2px solid #ffe6ac; outline-offset: 3px; }
+.ficha-acciones a:active { box-shadow: inset 0 0 .6rem #000a; }
+.ficha-acciones .ficha-accion-principal { background: linear-gradient(#f5cd86, #d99e53); color: #26180c; }
+.ficha-acciones .ficha-accion-principal:hover { background: #fbd798; }
 
-.ficha-descripcion dd {
-    white-space: pre-wrap;
+@media (max-width: 38rem) {
+    .ficha-instrumento, .ficha-acciones { grid-template-columns: 1fr; }
+    .ficha-instrumento > div { padding: .6rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .ficha-acciones a { transition: none; }
 }
 
 .botones-formulario .boton-eliminar {

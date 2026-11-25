@@ -19,19 +19,19 @@ export function iniciarCarrusel(sala, entorno = window, prepararVisor = iniciarV
     const ficha = sala.querySelector("[data-ficha]");
     const abrir = sala.querySelector("[data-especificaciones]");
     const movimientoReducido = entorno.matchMedia("(prefers-reduced-motion: reduce)");
-    let indice = 0;
+    let indice = Number(sala.dataset.indice) || 0;
     let transicion = null;
     let cambiando = false;
 
     if (!fichas.length || typeof dialogo.showModal !== "function") return;
 
     escena.hidden = acciones.hidden = posicion.hidden = false;
-    const visor = prepararVisor(sala, entorno, fichas[0].dataset.acabado, sala.dataset.categoria);
+    const visor = prepararVisor(sala, entorno, fichas[indice].dataset.acabado, sala.dataset.categoria);
     sala.querySelector("[data-fichas]").hidden = true;
 
     function actualizar() {
         const pieza = fichas[indice];
-        posicion.textContent = `${indice + 1} de ${fichas.length}`;
+        posicion.textContent = `${indice + 1} de ${fichas.length} · ${pieza.dataset.identidad}`;
         ficha.replaceChildren(pieza.querySelector("article").cloneNode(true));
     }
 

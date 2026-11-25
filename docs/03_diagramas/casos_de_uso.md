@@ -10,6 +10,7 @@ flowchart LR
         sala(["Consultar instrumentos de una categoría"])
         girar(["Girar el modelo 3D de la categoría"])
         alternar(["Recorrer instrumentos de la sala"])
+        verEnTresD(["Abrir un registro del inventario en 3D"])
         especificaciones(["Ver especificaciones de la selección"])
         catalogo(["Consultar inventario"])
         detalle(["Consultar detalle"])
@@ -23,6 +24,7 @@ flowchart LR
     actor --- sala
     actor --- girar
     actor --- alternar
+    actor --- verEnTresD
     actor --- especificaciones
     actor --- catalogo
     actor --- detalle

@@ -20,6 +20,8 @@ Las ocho pruebas de JMH-001 siguen cubriendo creación, consulta, 404, edición 
 
 ## Pruebas de la galería
 
+La ficha de Inventario tiene cobertura en las cuatro categorías con una plantilla compartida, precio CLP, descripción de 100 caracteres y los enlaces Ver en 3D, Editar instrumento y Volver al catálogo. Se comprueba el stock cero, singular y plural en la ficha y el aviso de stock bajo en el listado.
+
 | Requisito | Evidencia automatizada |
 | --- | --- |
 | Acceso y cuatro vitrinas | Django comprueba los accesos de recepción, destinos, nombres, PNG disponibles y textos de acción. |
@@ -28,5 +30,6 @@ Las ocho pruebas de JMH-001 siguen cubriendo creación, consulta, 404, edición 
 | Carrusel circular y transición | Node comprueba cinco registros, retorno circular, desplazamiento y movimiento reducido. |
 | Especificaciones y estados límite | Django comprueba datos reales, acabados, precio CLP y salas con cero o un registro. Node comprueba la sincronización con la selección, el cierre por clic exterior y el retorno de foco. |
 | Cuatro salas y cambios del CRUD | Django comprueba las cuatro categorías y que agregar un quinto registro, editar su marca y eliminarlo se refleje en su sala. Node verifica los cinco acabados únicamente en los nodos autorizados. Khronos glTF Validator revisa la conformidad de los cuatro GLB. |
+| Acceso directo desde Inventario | Django comprueba enlaces en el listado y en detalle, redirección por ID vigente, cambio de categoría, datos editados, agotados, eliminados e IDs ajenos o no válidos. Node verifica que el visor y el diálogo se inicialicen en la selección solicitada. |
 
 La revisión de distribución en escritorio y móvil, de foco visible y de rotación renderizada se realiza siguiendo el [caso de uso de la galería](../04_casos_de_uso/galeria.md).
