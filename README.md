@@ -81,7 +81,7 @@ Desde cada tarjeta puedes abrir la ficha (**READ**), editar el registro precarga
 ```powershell
 python manage.py check
 python manage.py test
-node --test instrumentos/tests_js/validaciones.test.js
+node --test instrumentos/tests_js/validaciones.test.js instrumentos/tests_js/fachada.test.js
 ```
 
 Django crea y retira un esquema de pruebas separado. Las pruebas JavaScript usan eventos simulados y se complementan con la comprobación manual descrita en la [matriz de validaciones](docs/07_pruebas/matriz_validaciones.md). Consulta también las [reglas de campos](docs/06_validaciones/reglas_campos.md).
