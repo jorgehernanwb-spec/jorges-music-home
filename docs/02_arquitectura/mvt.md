@@ -39,7 +39,7 @@ El middleware CSRF valida las solicitudes POST y los formularios de escritura in
 | Capa | Controles |
 | --- | --- |
 | Navegador | HTML aporta selectores, campos obligatorios y límites de entrada. `validaciones.js` ayuda con la escritura numérica, el formato CLP y el contador de descripción. |
-| Django | El formulario y el modelo comprueban nombre de 2 a 20 caracteres, 13 marcas, seis categorías, precio de $1 a $999.999 CLP, stock de 0 a 999 y descripción opcional de hasta 100 caracteres. El servidor valida las solicitudes aunque JavaScript esté desactivado. |
+| Django | El formulario y el modelo comprueban nombre de 2 a 20 caracteres, cinco marcas, cuatro categorías, precio de $1 a $999.999 CLP, stock de 0 a 999 y descripción opcional de hasta 100 caracteres. El servidor valida las solicitudes aunque JavaScript esté desactivado. |
 | MariaDB | La longitud declarada de la columna y los `CHECK` protegen el nombre de 2 a 20 caracteres, la descripción de hasta 100 y los rangos de precio y stock. Las listas de marca y categoría y los caracteres del nombre se comprueban en Django. |
 
 Por ejemplo, `PrecioCLPField.to_python()` usa `analizar_precio()` para convertir `$100.000` al entero `100000`. El ORM guarda ese entero y el filtro de plantilla `clp` vuelve a mostrar el importe con formato chileno. Las escrituras directas mediante ORM requieren validación explícita si deben aplicar todas las reglas de Django.

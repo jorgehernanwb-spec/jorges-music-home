@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="{% static 'instrumentos/css/pie-global.css' %}">
 </head>
 
-<body class="pagina-con-pie pagina-inventario">
+<body class="pagina-con-pie pagina-inventario{% block clase_pagina %}{% endblock %}">
     <header class="encabezado">
         <a href="{% url 'instrumentos:inicio' %}" class="marca">
             JORGE'S <span>MUSIC HOME</span>

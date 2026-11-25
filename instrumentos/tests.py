@@ -1,7 +1,11 @@
 import re
+from collections import Counter
+from importlib import import_module
 
 from django.core.exceptions import ValidationError
+from django.core.management import call_command
 from django.db import IntegrityError, connection, transaction
+from django.db.migrations.executor import MigrationExecutor
 from django.test import Client, SimpleTestCase, TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -98,6 +102,94 @@ class RecepcionTests(SimpleTestCase):
                 )
 
 
+class CatalogoInicialTests(TestCase):
+    def repetir_migrate(self):
+        call_command(
+            "migrate", "instrumentos", "0006_cargar_catalogo_inicial",
+            interactive=False, verbosity=0,
+        )
+
+    def test_instalacion_limpia_carga_catálogo_aprobado(self):
+        instrumentos = list(Instrumento.objects.all())
+        self.assertEqual(len(instrumentos), 16)
+        self.assertEqual(Counter(i.categoria for i in instrumentos), {
+            "Guitarras": 4, "Bajos": 4, "Teclados": 4, "Percusion": 4,
+        })
+        self.assertEqual({i.marca for i in instrumentos}, {"Fender", "Gibson", "Yamaha", "Roland", "Ibanez"})
+        modelos = {
+            "Pacifica", "RG GIO", "Stratocaster", "Les Paul", "TRBX", "SR300",
+            "Jazz Bass", "Thunderbird", "PSR-E383", "GO:KEYS 5", "MX61",
+            "JUNO-D6", "Rydeen", "TD-02K", "Stage Custom", "TD-07DMK",
+        }
+        self.assertEqual({i.descripcion.split(",", 1)[0].removeprefix("Modelo ") for i in instrumentos}, modelos)
+        nombres = {
+            "Guitarras": {"Guitarra eléctrica"},
+            "Bajos": {"Bajo eléctrico"},
+            "Teclados": {"Teclado digital"},
+            "Percusion": {"Batería acústica", "Batería electrónica"},
+        }
+        for instrumento in instrumentos:
+            with self.subTest(pk=instrumento.pk):
+                self.assertIn(instrumento.nombre, nombres[instrumento.categoria])
+                self.assertLessEqual(len(instrumento.descripcion), 100)
+                instrumento.full_clean()
+
+    def test_migrate_repetido_conserva_ediciones_y_no_recrea_borrados(self):
+        instrumento = Instrumento.objects.get(descripcion__startswith="Modelo Pacifica,")
+        editar = reverse("instrumentos:editar", args=[instrumento.pk])
+        datos = {
+            "nombre": "Guitarra de prueba", "marca": "Roland", "categoria": "Bajos",
+            "precio": "$210.000", "stock": 0, "descripcion": "Descripción editada",
+        }
+        self.assertRedirects(self.client.post(editar, datos), reverse("instrumentos:lista"))
+
+        eliminado = Instrumento.objects.get(descripcion__startswith="Modelo Rydeen,")
+        eliminar = reverse("instrumentos:eliminar", args=[eliminado.pk])
+        self.assertContains(self.client.get(eliminar), "Confirmar eliminación")
+        self.assertRedirects(self.client.post(eliminar), reverse("instrumentos:lista"))
+
+        antes = list(Instrumento.objects.order_by("pk").values_list())
+        self.repetir_migrate()
+        self.assertEqual(list(Instrumento.objects.order_by("pk").values_list()), antes)
+        self.assertEqual(Instrumento.objects.count(), 15)
+        self.assertFalse(Instrumento.objects.filter(pk=eliminado.pk).exists())
+        instrumento.refresh_from_db()
+        self.assertEqual(instrumento.precio, 210000)
+        for campo in ("nombre", "marca", "categoria", "stock", "descripcion"):
+            self.assertEqual(getattr(instrumento, campo), datos[campo])
+        self.assertContains(self.client.get(editar), 'style="--acabado: #F1F0E9"')
+
+    def test_carga_sobre_datos_existentes_conserva_una_coincidencia_y_otros_registros(self):
+        Instrumento.objects.all().delete()
+        manual = Instrumento.objects.create(
+            nombre="Teclado digital", marca="Ibanez", categoria="Teclados",
+            precio=100000, stock=0, descripcion="Ingreso manual.",
+        )
+        coincidencia = Instrumento.objects.create(
+            nombre="Guitarra de sala", marca="Yamaha", categoria="Guitarras",
+            precio=1, stock=1, descripcion="Modelo PACIFICA, unidad de demostración usada.",
+        )
+        antes = list(Instrumento.objects.order_by("pk").values_list())
+        carga = import_module("instrumentos.migrations.0006_cargar_catalogo_inicial").cargar_catalogo
+        estado = MigrationExecutor(connection).loader.project_state([("instrumentos", "0005_catalogo_categorias_marcas")])
+        carga(estado.apps, connection.schema_editor())
+        self.assertEqual(Instrumento.objects.count(), 17)
+        self.assertEqual(
+            list(Instrumento.objects.filter(pk__in=[manual.pk, coincidencia.pk]).order_by("pk").values_list()),
+            antes,
+        )
+        self.assertEqual(Instrumento.objects.filter(descripcion__icontains="Pacifica").count(), 1)
+
+    def test_inventario_filtra_las_baterias_roland_del_catalogo(self):
+        respuesta = self.client.get(reverse("instrumentos:lista"), {
+            "q": "Roland", "categoria": "Percusion", "disponibilidad": "con",
+        })
+        self.assertContains(respuesta, "Resultados: 2")
+        self.assertContains(respuesta, "$499.990 CLP")
+        self.assertContains(respuesta, "$899.990 CLP")
+        self.assertNotContains(respuesta, "$399.990 CLP")
+
+
 class InstrumentoCRUDTests(TestCase):
     datos = {
         "nombre": "Bajo Precision",
@@ -110,6 +202,7 @@ class InstrumentoCRUDTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        Instrumento.objects.all().delete()
         cls.instrumento = Instrumento.objects.create(**cls.datos)
 
     def test_footer_global_unico_y_con_el_ano_actual(self):
@@ -128,8 +221,15 @@ class InstrumentoCRUDTests(TestCase):
     def test_el_alta_conserva_el_formulario_y_guarda(self):
         url = reverse("instrumentos:crear")
         response = self.client.get(url)
+        self.assertTemplateUsed(response, "instrumentos/crear.html")
+        self.assertContains(response, '<h1 id="titulo-crear">Agregar instrumento</h1>', html=True)
+        self.assertContains(response, "Incorpora un nuevo instrumento a nuestra colección")
+        self.assertContains(response, f'<form method="post" action="{url}">')
+        self.assertContains(response, "Guardar instrumento")
+        self.assertContains(response, f'href="{reverse("instrumentos:lista")}" class="boton-secundario"')
         self.assertContains(response, 'name="nombre"')
         self.assertContains(response, 'name="csrfmiddlewaretoken"')
+        self.assertTrue(all(campo.value() in (None, "") for campo in response.context["formulario"]))
 
         response = self.client.post(url, {**self.datos, "nombre": "Bajo Jazz"})
         self.assertRedirects(response, reverse("instrumentos:lista"))
@@ -158,6 +258,10 @@ class InstrumentoCRUDTests(TestCase):
         response = self.client.get(url)
         self.assertTemplateUsed(response, "instrumentos/editar.html")
         self.assertContains(response, "Editar instrumento")
+        self.assertContains(response, "<strong>Bajo Precision</strong>", html=True)
+        self.assertContains(response, f'<form method="post" action="{url}">')
+        self.assertContains(response, "Guardar cambios")
+        self.assertContains(response, f'href="{reverse("instrumentos:detalle", args=[self.instrumento.pk])}">Cancelar')
         self.assertContains(response, 'value="Bajo Precision"')
         self.assertContains(response, 'value="$250.000"')
         self.assertContains(response, '<option value="Fender" selected>Fender</option>', html=True)
@@ -183,24 +287,51 @@ class InstrumentoCRUDTests(TestCase):
 
     def test_edicion_invalida_muestra_errores_y_conserva_datos(self):
         url = reverse("instrumentos:editar", args=[self.instrumento.pk])
-        response = self.client.post(url, {**self.datos, "nombre": "Bajo Jazz", "stock": 1000})
+        response = self.client.post(url, {
+            **self.datos, "nombre": "Bajo Jazz", "marca": "Yamaha",
+            "categoria": "Guitarras", "stock": 1000,
+        })
         self.assertTemplateUsed(response, "instrumentos/editar.html")
         self.assertIn("stock", response.context["formulario"].errors)
         self.assertContains(response, 'class="errorlist"')
+        self.assertContains(response, 'id="id_stock_errores"')
+        self.assertContains(response, 'aria-describedby="id_stock_errores"')
+        self.assertContains(response, "<strong>Bajo Precision</strong>", html=True)
+        self.assertContains(response, "<div><dt>Marca</dt><dd>Fender</dd></div>", html=True)
+        self.assertContains(response, "<div><dt>Categoría</dt><dd>Bajos</dd></div>", html=True)
         self.assertContains(response, 'value="Bajo Jazz"')
+        self.assertContains(response, '<option value="Yamaha" selected>Yamaha</option>', html=True)
+        self.assertContains(response, '<option value="Guitarras" selected>Guitarras</option>', html=True)
         self.assertContains(response, 'value="1000"')
         self.instrumento.refresh_from_db()
         for campo, dato in self.datos.items():
             self.assertEqual(getattr(self.instrumento, campo), dato)
+
+    def test_alta_y_edicion_muestran_errores_en_los_campos_obligatorios(self):
+        rutas = (reverse("instrumentos:crear"), reverse("instrumentos:editar", args=[self.instrumento.pk]))
+        for ruta in rutas:
+            with self.subTest(ruta=ruta):
+                response = self.client.post(ruta, {})
+                campos = {"nombre", "marca", "categoria", "precio", "stock"}
+                self.assertEqual(set(response.context["formulario"].errors), campos)
+                for campo in campos:
+                    self.assertContains(response, f'<label for="id_{campo}">')
+                    self.assertContains(response, f'id="id_{campo}_errores"')
+                self.assertContains(response, 'class="grupo-campo grupo-campo--ancho"')
 
     def test_get_muestra_confirmacion_y_no_elimina(self):
         url = reverse("instrumentos:eliminar", args=[self.instrumento.pk])
         response = self.client.get(url)
         self.assertTemplateUsed(response, "instrumentos/confirmar_eliminar.html")
         self.assertContains(response, self.instrumento.nombre)
+        self.assertContains(response, "<div><dt>Marca</dt><dd>Fender</dd></div>", html=True)
+        self.assertContains(response, "<div><dt>Categoría</dt><dd>Bajos</dd></div>", html=True)
+        self.assertContains(response, "Esta acción es permanente")
+        self.assertContains(response, 'aria-describedby="aviso-eliminacion"')
         self.assertContains(response, "Confirmar eliminación")
         self.assertContains(response, "Cancelar")
         self.assertContains(response, 'method="post"')
+        self.assertLess(response.content.index(b">Cancelar</a>"), response.content.index(b">Confirmar"))
         self.assertTrue(Instrumento.objects.filter(pk=self.instrumento.pk).exists())
 
     def test_borrado_requiere_csrf_y_elimina_con_post_valido(self):
@@ -221,6 +352,127 @@ class InstrumentoCRUDTests(TestCase):
         self.assertRedirects(response, reverse("instrumentos:lista"))
         self.assertContains(response, "Instrumento eliminado correctamente.")
         self.assertFalse(Instrumento.objects.filter(pk=self.instrumento.pk).exists())
+
+
+class InventarioFiltrosTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        Instrumento.objects.all().delete()
+        cls.bajo = Instrumento.objects.create(
+            nombre="Bajo Jazz", marca="Fender", categoria="Bajos", precio=100000, stock=2,
+        )
+        cls.guitarra = Instrumento.objects.create(
+            nombre="Guitarra Luna", marca="fender", categoria="Guitarras", precio=150000, stock=0,
+        )
+        cls.teclado = Instrumento.objects.create(
+            nombre="Piano Claro", marca="Yamaha", categoria="Teclados", precio=200000, stock=5,
+        )
+        cls.bajo_sin_stock = Instrumento.objects.create(
+            nombre="Bajo Jazz", marca="Yamaha", categoria="Bajos", precio=130000, stock=0,
+        )
+
+    def consultar(self, **filtros):
+        return self.client.get(reverse("instrumentos:lista"), filtros)
+
+    def test_busqueda_por_nombre_sin_distinguir_mayusculas(self):
+        response = self.consultar(q="  jAzZ  ")
+        self.assertQuerySetEqual(response.context["instrumentos"], [self.bajo, self.bajo_sin_stock])
+        self.assertContains(response, 'name="q" value="jAzZ"')
+
+    def test_busqueda_por_marca_incluye_grafia_historica(self):
+        response = self.consultar(q="FeNd")
+        self.assertQuerySetEqual(response.context["instrumentos"], [self.bajo, self.guitarra])
+
+    def test_busqueda_de_veinte_caracteres_concuerda_con_maxlength(self):
+        nombre = "Bateria" + "a" * 13
+        instrumento = Instrumento.objects.create(
+            nombre=nombre, marca="Yamaha", categoria="Percusion", precio=1, stock=1,
+        )
+        response = self.consultar(q=nombre, categoria="Percusion", disponibilidad="con")
+        self.assertQuerySetEqual(response.context["instrumentos"], [instrumento])
+        self.assertContains(response, 'maxlength="20"')
+        self.assertContains(response, f'name="q" value="{nombre}"')
+
+    def test_busqueda_excesiva_no_consulta_y_conserva_los_selectores(self):
+        for entrada in ("A" * 21, " " * 21, "A" * 300):
+            with self.subTest(entrada=entrada), self.assertNumQueries(0):
+                response = self.consultar(q=entrada, categoria="Guitarras", disponibilidad="sin")
+                self.assertContains(response, "La búsqueda admite un máximo de 20 caracteres.")
+                self.assertContains(response, 'aria-invalid="true"')
+                self.assertContains(response, 'value="Guitarras" selected')
+                self.assertContains(response, 'value="sin" selected')
+                self.assertNotContains(response, "No se encontraron instrumentos")
+                self.assertNotContains(response, "Aún no hay instrumentos registrados")
+
+    def test_filtro_categoria_y_opciones_reales(self):
+        response = self.consultar(categoria="Bajos")
+        self.assertQuerySetEqual(response.context["instrumentos"], [self.bajo, self.bajo_sin_stock])
+        self.assertContains(response, '<option value="Bajos" selected>Bajos</option>', html=True)
+        self.assertContains(response, '<option value="Percusion">Baterías</option>', html=True)
+        self.assertEqual(
+            list(response.context["categorias"]),
+            [("Guitarras", "Guitarras"), ("Bajos", "Bajos"), ("Teclados", "Teclados"), ("Percusion", "Baterías")],
+        )
+
+    def test_disponibilidad_con_stock_y_sin_stock(self):
+        for estado, registros in (
+            ("con", [self.bajo, self.teclado]),
+            ("sin", [self.bajo_sin_stock, self.guitarra]),
+        ):
+            with self.subTest(estado=estado):
+                response = self.consultar(disponibilidad=estado)
+                self.assertQuerySetEqual(response.context["instrumentos"], registros)
+                self.assertContains(response, f'value="{estado}" selected')
+
+    def test_combina_busqueda_categoria_y_disponibilidad(self):
+        response = self.consultar(q="Fender", categoria="Guitarras", disponibilidad="sin")
+        self.assertQuerySetEqual(response.context["instrumentos"], [self.guitarra])
+        self.assertContains(response, 'name="q" value="Fender"')
+        self.assertContains(response, 'value="Guitarras" selected')
+        self.assertContains(response, 'value="sin" selected')
+
+    def test_ignora_opciones_invalidas_sin_descartar_la_busqueda(self):
+        response = self.consultar(q="Piano", categoria="Otra", disponibilidad="negativo")
+        self.assertQuerySetEqual(response.context["instrumentos"], [self.teclado])
+        self.assertEqual(response.context["categoria_seleccionada"], "")
+        self.assertEqual(response.context["disponibilidad"], "")
+
+    def test_distingue_inventario_vacio_de_busqueda_sin_resultados(self):
+        response = self.consultar(q="Sin coincidencias")
+        self.assertContains(response, "No se encontraron instrumentos con los criterios seleccionados")
+        self.assertNotContains(response, "Aún no hay instrumentos registrados")
+        self.assertContains(
+            response,
+            f'<a class="inventario-enlace" href="{reverse("instrumentos:lista")}">limpia los filtros</a>',
+            html=True,
+        )
+        Instrumento.objects.all().delete()
+        response = self.consultar(q="Sin coincidencias")
+        self.assertContains(response, "Aún no hay instrumentos registrados")
+        self.assertNotContains(response, "No se encontraron instrumentos con los criterios seleccionados")
+
+    def test_limpiar_filtros_restaura_el_listado_alfabetico_con_desempate_por_id(self):
+        response = self.consultar(categoria="Teclados")
+        lista = reverse("instrumentos:lista")
+        self.assertContains(
+            response, f'<a class="inventario-enlace" href="{lista}">Limpiar filtros</a>', html=True,
+        )
+        response = self.client.get(lista)
+        self.assertQuerySetEqual(
+            response.context["instrumentos"], [self.bajo, self.bajo_sin_stock, self.guitarra, self.teclado],
+        )
+
+    def test_inventario_enlaza_a_las_cuatro_operaciones_crud(self):
+        response = self.consultar(q="Fender", disponibilidad="con")
+        for nombre, args in (
+            ("crear", ()), ("detalle", (self.bajo.pk,)), ("editar", (self.bajo.pk,)),
+            ("eliminar", (self.bajo.pk,)),
+        ):
+            with self.subTest(nombre=nombre):
+                ruta = reverse(f"instrumentos:{nombre}", args=args)
+                self.assertContains(response, f'href="{ruta}"')
+                self.assertEqual(self.client.get(ruta).status_code, 200)
+        self.assertEqual(Instrumento.objects.count(), 4)
 
 
 class PrecioCLPTests(SimpleTestCase):
@@ -250,6 +502,7 @@ class ValidacionesInstrumentoTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        Instrumento.objects.all().delete()
         cls.instrumento = Instrumento.objects.create(**cls.datos)
 
     def rutas_crud(self):
@@ -258,11 +511,47 @@ class ValidacionesInstrumentoTests(TestCase):
             reverse("instrumentos:editar", args=[self.instrumento.pk]),
         )
 
+    def test_selectores_de_alta_y_edicion_ofrecen_solo_las_opciones_definitivas(self):
+        for ruta in self.rutas_crud():
+            with self.subTest(ruta=ruta):
+                respuesta = self.client.get(ruta)
+                campos = respuesta.context["formulario"].fields
+                self.assertEqual(
+                    [valor for valor, _ in campos["marca"].choices if valor],
+                    ["Fender", "Gibson", "Yamaha", "Roland", "Ibanez"],
+                )
+                self.assertEqual(
+                    [(valor, etiqueta) for valor, etiqueta in campos["categoria"].choices if valor],
+                    [("Guitarras", "Guitarras"), ("Bajos", "Bajos"), ("Teclados", "Teclados"), ("Percusion", "Baterías")],
+                )
+
+    def test_todas_las_marcas_estan_disponibles_en_cada_categoria(self):
+        for marca, _ in Instrumento.MARCAS:
+            for categoria, _ in Instrumento.CATEGORIAS:
+                with self.subTest(marca=marca, categoria=categoria):
+                    formulario = InstrumentoForm({**self.datos, "marca": marca, "categoria": categoria})
+                    self.assertTrue(formulario.is_valid(), formulario.errors)
+
+    def test_editar_marca_actualiza_el_acabado_sin_alterar_el_precio(self):
+        _, editar = self.rutas_crud()
+        respuesta = self.client.get(editar)
+        self.assertContains(respuesta, 'style="--acabado: #CF3434"')
+        self.assertEqual(respuesta.context["colores_marca"], {
+            "Fender": "#CF3434", "Gibson": "#2975CD", "Yamaha": "#232323",
+            "Roland": "#F1F0E9", "Ibanez": "#8650C0",
+        })
+        respuesta = self.client.post(editar, {**self.datos, "marca": "Roland"})
+        self.assertRedirects(respuesta, reverse("instrumentos:lista"))
+        self.instrumento.refresh_from_db()
+        self.assertEqual(self.instrumento.marca, "Roland")
+        self.assertEqual(self.instrumento.precio, self.datos["precio"])
+        self.assertContains(self.client.get(editar), 'style="--acabado: #F1F0E9"')
+
     def test_create_y_update_rechazan_los_mismos_valores(self):
         invalidos = {
             "nombre": ("", "A", "A" * 21, "12345", "Bajo 2", "   ", "--", "Bajo!", "Ba\tjo"),
-            "marca": ("", "Otra marca", "fender"),
-            "categoria": ("", "Otra categoría"),
+            "marca": ("", "Otra marca", "fender", "Casio", "Pearl"),
+            "categoria": ("", "Otra categoría", "Viento", "Acusticos"),
             "precio": ("", "0", "1000000", "9999999", "-100", "1.50", "abc", "$1.00.0", "12.345.678"),
             "stock": ("", "1000", "0000", "-1", "1.0", "abc"),
             "descripcion": ("a" * 101, " " * 101),
@@ -351,6 +640,7 @@ class ValidacionesInstrumentoTests(TestCase):
                 contenido = response.content.decode(response.charset)
                 self.assertRegex(contenido, r'name="precio"[^>]*data-precio-clp=""[^>]*data-max-digitos="6"')
                 self.assertRegex(contenido, r'name="stock"[^>]*data-error-stock="[^"]+"[^>]*data-max-digitos="3"')
+                self.assertRegex(contenido, r'name="nombre"[^>]*minlength="2"[^>]*maxlength="20"')
                 for nombre, etiqueta, limite in (
                     ("nombre", "input", 20), ("stock", "input", 3),
                     ("descripcion", "textarea", 100),

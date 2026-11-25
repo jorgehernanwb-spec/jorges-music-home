@@ -1,16 +1,30 @@
 {% extends 'instrumentos/base.html' %}
+{% block clase_pagina %} pagina-showroom{% endblock %}
 
 {% block contenido %}
-<section class="seccion-formulario" aria-labelledby="titulo-eliminar">
+<section class="seccion-formulario seccion-formulario--borrado" aria-labelledby="titulo-eliminar">
     <div class="panel-formulario panel-instrumento panel-eliminar">
-        <p class="subtitulo">INVENTARIO</p>
-        <h1 id="titulo-eliminar">Eliminar instrumento</h1>
-        <p class="descripcion-formulario">
-            ¿Quieres eliminar <strong>{{ instrumento.nombre }}</strong> del inventario?
-            Esta acción es permanente.
+        <div class="cabecera-formulario">
+            <h1 id="titulo-eliminar">Eliminar instrumento</h1>
+        </div>
+        <div class="ficha-showroom">
+            <p><strong>{{ instrumento.nombre }}</strong></p>
+            {% if instrumento.marca or instrumento.categoria %}
+                <dl class="datos-showroom">
+                    {% if instrumento.marca %}
+                        <div><dt>Marca</dt><dd>{{ instrumento.marca }}</dd></div>
+                    {% endif %}
+                    {% if instrumento.categoria %}
+                        <div><dt>Categoría</dt><dd>{{ instrumento.get_categoria_display }}</dd></div>
+                    {% endif %}
+                </dl>
+            {% endif %}
+        </div>
+        <p id="aviso-eliminacion" class="aviso-eliminacion">
+            Esta acción es permanente y quitará el instrumento del inventario.
         </p>
 
-        <form method="post" action="{% url 'instrumentos:eliminar' instrumento.pk %}">
+        <form method="post" action="{% url 'instrumentos:eliminar' instrumento.pk %}" aria-describedby="aviso-eliminacion">
             {% csrf_token %}
             <div class="botones-formulario">
                 <a class="boton-secundario" href="{% url 'instrumentos:lista' %}">Cancelar</a>

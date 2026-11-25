@@ -1,91 +1,102 @@
-
 {% extends 'instrumentos/base.html' %}
 {% load instrumentos_formato %}
 
 {% block contenido %}
+<section class="inventario" aria-labelledby="titulo-inventario">
+    <header class="inventario-cabecera">
+        <h1 id="titulo-inventario">Inventario</h1>
+        <a class="boton inventario-boton" href="{% url 'instrumentos:crear' %}">Agregar instrumento</a>
+    </header>
 
-<section class="presentacion">
-    <p class="subtitulo">WELCOME TO THE MUSIC HOUSE</p>
-    <h1>Descubre tu próximo sonido</h1>
-    <p>
-        Explora nuestra colección de instrumentos
-        musicales en un ambiente único.
-    </p>
-    <a href="{% url 'instrumentos:crear' %}"
-       class="boton">
-        + Registrar instrumento
-    </a>
-</section>
-
-<section class="catalogo">
-    <div class="titulo-seccion">
+    <form class="inventario-filtros" method="get" action="{% url 'instrumentos:lista' %}" aria-label="Filtros del inventario">
         <div>
-            <p class="subtitulo">NUESTRA COLECCIÓN</p>
-            <h2>Instrumentos musicales</h2>
-        </div>
-        <span>{{ instrumentos|length }} registrados</span>
-    </div>
-
-    <div class="grid-instrumentos">
-        {% for instrumento in instrumentos %}
-            <article class="tarjeta">
-                <div class="tarjeta-imagen">
-                    <span class="simbolo">♫</span>
-                </div>
-
-                <div class="tarjeta-contenido">
-                    <p class="categoria">
-                        {{ instrumento.get_categoria_display }}
-                    </p>
-
-                    <h3>{{ instrumento.nombre }}</h3>
-                    <p class="marca-instrumento">
-                        {{ instrumento.marca }}
-                    </p>
-
-                    <p class="precio">
-                        {{ instrumento.precio|clp }} CLP
-                    </p>
-
-                    {% if instrumento.stock == 0 %}
-                        <p class="agotado">Sin stock</p>
-                    {% elif instrumento.stock <= 2 %}
-                        <p class="stock-bajo">
-                            Stock bajo ({{ instrumento.stock }})
-                        </p>
-                    {% else %}
-                        <p class="disponible">
-                            Disponible ({{ instrumento.stock }})
-                        </p>
-                    {% endif %}
-
-                    <div class="acciones">
-                        <a href="{% url 'instrumentos:detalle' instrumento.pk %}">
-                            Ver
-                        </a>
-                        <a href="{% url 'instrumentos:editar' instrumento.pk %}">
-                            Editar
-                        </a>
-                        <a href="{% url 'instrumentos:eliminar' instrumento.pk %}">
-                            Eliminar
-                        </a>
-                    </div>
-                </div>
-            </article>
-        {% empty %}
-            <div class="sin-registros">
-                <h3>Aún no hay instrumentos registrados</h3>
-                <p>
-                    Comienza agregando el primer instrumento
-                    a nuestra tienda.
+            <label for="inventario-busqueda">Buscar instrumento</label>
+            <input type="search" id="inventario-busqueda" name="q" value="{{ busqueda }}"
+                   maxlength="{{ busqueda_max }}" placeholder="Nombre o marca"{% if busqueda_invalida %}
+                   aria-invalid="true" aria-describedby="inventario-busqueda-error"{% endif %}>
+            {% if busqueda_invalida %}
+                <p class="errores" id="inventario-busqueda-error" role="alert">
+                    La búsqueda admite un máximo de {{ busqueda_max }} caracteres.
                 </p>
-                <a href="{% url 'instrumentos:crear' %}"
-                   class="boton">
-                    Registrar instrumento
-                </a>
-            </div>
-        {% endfor %}
-    </div>
-</section>
+            {% endif %}
+        </div>
+        <div>
+            <label for="inventario-categoria">Categoría</label>
+            <select id="inventario-categoria" name="categoria">
+                <option value="">Todas las categorías</option>
+                {% for valor, etiqueta in categorias %}
+                    <option value="{{ valor }}"{% if valor == categoria_seleccionada %} selected{% endif %}>{{ etiqueta }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="inventario-disponibilidad">Disponibilidad</label>
+            <select id="inventario-disponibilidad" name="disponibilidad">
+                <option value="">Todos</option>
+                <option value="con"{% if disponibilidad == 'con' %} selected{% endif %}>Con stock</option>
+                <option value="sin"{% if disponibilidad == 'sin' %} selected{% endif %}>Sin stock</option>
+            </select>
+        </div>
+        <div class="inventario-filtro-acciones">
+            <button type="submit" class="boton inventario-boton">Buscar</button>
+            <a class="inventario-enlace" href="{% url 'instrumentos:lista' %}">Limpiar filtros</a>
+        </div>
+    </form>
 
+    {% if not busqueda_invalida %}
+        <p class="inventario-resultados">Resultados: {{ instrumentos|length }}</p>
+    {% endif %}
+
+    {% if instrumentos %}
+        <table class="inventario-tabla" role="table" aria-label="Instrumentos del inventario">
+            <thead role="rowgroup">
+                <tr role="row">
+                    <th scope="col" role="columnheader">Nombre</th>
+                    <th scope="col" role="columnheader">Marca</th>
+                    <th scope="col" role="columnheader">Categoría</th>
+                    <th scope="col" role="columnheader">Precio CLP</th>
+                    <th scope="col" role="columnheader">Stock</th>
+                    <th scope="col" role="columnheader">Acciones</th>
+                </tr>
+            </thead>
+            <tbody role="rowgroup">
+                {% for instrumento in instrumentos %}
+                    <tr role="row">
+                        <th scope="row" role="rowheader">{{ instrumento.nombre }}</th>
+                        <td role="cell"><span class="inventario-etiqueta" aria-hidden="true">Marca</span>{{ instrumento.marca }}</td>
+                        <td role="cell"><span class="inventario-etiqueta" aria-hidden="true">Categoría</span>{{ instrumento.get_categoria_display }}</td>
+                        <td role="cell" class="inventario-precio"><span class="inventario-etiqueta" aria-hidden="true">Precio</span>{{ instrumento.precio|clp }} CLP</td>
+                        <td role="cell">
+                            <span class="inventario-etiqueta" aria-hidden="true">Stock</span>
+                            {% if instrumento.stock == 0 %}
+                                <span class="agotado">Sin stock</span>
+                            {% elif instrumento.stock <= 2 %}
+                                <span class="stock-bajo">Stock bajo ({{ instrumento.stock }})</span>
+                            {% else %}
+                                <span class="disponible">Disponible ({{ instrumento.stock }})</span>
+                            {% endif %}
+                        </td>
+                        <td role="cell" class="inventario-celda-acciones">
+                            <div class="inventario-acciones">
+                                <a href="{% url 'instrumentos:detalle' instrumento.pk %}" aria-label="Ver {{ instrumento.nombre }}">Ver</a>
+                                <a href="{% url 'instrumentos:editar' instrumento.pk %}" aria-label="Editar {{ instrumento.nombre }}">Editar</a>
+                                <a class="inventario-eliminar" href="{% url 'instrumentos:eliminar' instrumento.pk %}" aria-label="Eliminar {{ instrumento.nombre }}">Eliminar</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif inventario_vacio %}
+        <div class="inventario-vacio">
+            <h2>Aún no hay instrumentos registrados</h2>
+            <p>Usa «Agregar instrumento» para registrar el primero.</p>
+        </div>
+    {% elif not busqueda_invalida %}
+        <div class="inventario-vacio">
+            <h2>No se encontraron instrumentos con los criterios seleccionados</h2>
+            <p>Ajusta la búsqueda o <a class="inventario-enlace" href="{% url 'instrumentos:lista' %}">limpia los filtros</a> para ver el inventario completo.</p>
+        </div>
+    {% endif %}
+</section>
 {% endblock %}

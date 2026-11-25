@@ -21,17 +21,14 @@ from .validaciones import (
 class Instrumento(models.Model):
 
     MARCAS = [(marca, marca) for marca in (
-        "Fender", "Gibson", "Ibanez", "Yamaha", "Roland", "Casio", "Pearl",
-        "Tama", "Squier", "Cort", "Korg", "Epiphone", "Otras",
+        "Fender", "Gibson", "Yamaha", "Roland", "Ibanez",
     )]
 
     CATEGORIAS = [
         ("Guitarras", "Guitarras"),
         ("Bajos", "Bajos"),
         ("Teclados", "Teclados"),
-        ("Percusion", "Baterías y percusión"),
-        ("Viento", "Instrumentos de viento"),
-        ("Acusticos", "Acústicos"),
+        ("Percusion", "Baterías"),
     ]
 
     nombre = models.CharField(

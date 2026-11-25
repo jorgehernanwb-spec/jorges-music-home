@@ -1,47 +1,23 @@
 
 {% extends 'instrumentos/base.html' %}
+{% block clase_pagina %} pagina-showroom{% endblock %}
 
 {% block contenido %}
-
-<section class="seccion-formulario">
-
+<section class="seccion-formulario seccion-formulario--crud" aria-labelledby="titulo-crear">
     <div class="panel-formulario">
-
-        <p class="subtitulo">
-            JORGE'S MUSIC HOME
-        </p>
-
-        <h1>Nuevo instrumento</h1>
-
-        <p class="descripcion-formulario">
-            Registra un nuevo instrumento en
-            nuestro inventario musical.
-        </p>
-
-        <form method="POST"
-              action="{% url 'instrumentos:crear' %}">
-
+        <div class="cabecera-formulario">
+            {% include 'instrumentos/recepcion_icono.html' with icono='guitarra' only %}
+            <h1 id="titulo-crear">Agregar instrumento</h1>
+            <p>Incorpora un nuevo instrumento a nuestra colección</p>
+        </div>
+        <form method="post" action="{% url 'instrumentos:crear' %}">
             {% csrf_token %}
-
             {% include 'instrumentos/_campos_formulario.html' %}
-
             <div class="botones-formulario">
-
-                <button type="submit" class="boton">
-                    Guardar instrumento
-                </button>
-
-                <a href="{% url 'instrumentos:lista' %}"
-                   class="boton-secundario">
-                    Cancelar
-                </a>
-
+                <button type="submit" class="boton">Guardar instrumento</button>
+                <a href="{% url 'instrumentos:lista' %}" class="boton-secundario">Cancelar</a>
             </div>
-
         </form>
-
     </div>
-
 </section>
-
 {% endblock %}

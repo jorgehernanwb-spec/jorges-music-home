@@ -55,6 +55,10 @@ python manage.py migrate
 python manage.py runserver 127.0.0.1:8000
 ```
 
+En una base vacía, `migrate` aplica `0005` y luego `0006`, que carga 16 instrumentos de ejemplo: cuatro guitarras, cuatro bajos, cuatro teclados y cuatro baterías. Los nombres indican el tipo de instrumento y las descripciones indican el modelo. El inventario queda disponible en `/instrumentos/`.
+
+En una base existente se conservan los registros previos. La carga omite coincidencias por categoría, marca y modelo en la descripción. Si la descripción no identifica el modelo, la carga no puede reconocer esa coincidencia. Django registra `0006` como aplicada, por lo que volver a ejecutar `migrate` conserva los cambios y los borrados hechos desde el CRUD. La migración de datos es irreversible para proteger esos registros editables.
+
 | Dirección local | Uso |
 | --- | --- |
 | `http://127.0.0.1:8000/` | Fachada interactiva. Las puertas abren la recepción. |
@@ -71,8 +75,8 @@ Desde cada tarjeta puedes abrir la ficha (**READ**), editar el registro precarga
 | Campo | Regla |
 | --- | --- |
 | Nombre | De 2 a 20 caracteres. Letras, tildes, ñ, espacios internos y guiones. Se normalizan los espacios. |
-| Marca | 13 opciones predefinidas. |
-| Categoría | Seis opciones predefinidas. |
+| Marca | Fender, Gibson, Yamaha, Roland e Ibanez. |
+| Categoría | Guitarras, Bajos, Teclados y Baterías. |
 | Precio | Entero de $1 a $999.999 CLP, con hasta seis dígitos. `$100.000` se almacena como `100000`. |
 | Stock | Entero de 0 a 999. |
 | Descripción | Opcional, hasta 100 caracteres. |
@@ -82,7 +86,7 @@ Desde cada tarjeta puedes abrir la ficha (**READ**), editar el registro precarga
 ```powershell
 python manage.py check
 python manage.py test
-node --test instrumentos/tests_js/validaciones.test.js instrumentos/tests_js/fachada.test.js instrumentos/tests_js/recepcion.test.js
+node --test instrumentos/tests_js/validaciones.test.js instrumentos/tests_js/fachada.test.js instrumentos/tests_js/recepcion.test.js instrumentos/tests_js/acabado-marca.test.js
 ```
 
 Django crea y retira un esquema de pruebas separado. Las pruebas JavaScript usan eventos simulados y se complementan con la comprobación manual descrita en la [matriz de validaciones](docs/07_pruebas/matriz_validaciones.md). Consulta también las [reglas de campos](docs/06_validaciones/reglas_campos.md).
