@@ -17,7 +17,7 @@
 | Ruta | Nombre | Comportamiento |
 | --- | --- | --- |
 | `/` | `inicio` | `TemplateView` muestra la fachada. El enlace de las puertas lleva a `/recepcion/`. |
-| `/recepcion/` | `recepcion` | Muestra la recepción y el menú principal. |
+| `/recepcion/` | `recepcion` | Muestra la recepción y el menú principal. La plantilla contiene el diálogo [Nuestra historia](../04_casos_de_uso/nuestra_historia.md). Abre con el controlador de recepción y enlaza a las vistas existentes de colección y Mundo musical. |
 | `/coleccion/` | `coleccion` | Muestra las cuatro vitrinas con los nombres del modelo. |
 | `/coleccion/<slug:categoria>/` | `coleccion_categoria` | GET y HEAD muestran la sala y sus registros actuales. Las cuatro salas comparten visor y carrusel. Un slug desconocido devuelve 404. |
 | `/coleccion/instrumento/<int:pk>/` | `coleccion_instrumento` | Consulta la categoría vigente y redirige a su sala con `?instrumento=<id>`. Si el registro ya no existe, vuelve a las categorías. |

@@ -37,3 +37,7 @@ La ficha de Inventario tiene cobertura en las cuatro categorías con una plantil
 Django comprueba la entrada del menú, los doce enlaces nativos, cuatro artículos por tema, la existencia de sus imágenes, el contenido distintivo de cada artículo, el área de lectura enfocable, el regreso, el pie único, el 404 y el rechazo de POST. Estas pruebas usan `SimpleTestCase` porque las vistas editoriales no consultan MariaDB. La cuadrícula, el foco visible y el desplazamiento interno se revisan en Edge, según el [caso de uso](../04_casos_de_uso/mundo_musical.md).
 
 La revisión de distribución en escritorio y móvil, de foco visible y de rotación renderizada se realiza siguiendo el [caso de uso de la galería](../04_casos_de_uso/galeria.md).
+
+## Nuestra historia
+
+Django comprueba que ambos accesos de Recepción apuntan al mismo diálogo, sus pilares, ambos destinos y el pie global único. Node comprueba la apertura y el retorno del foco a cada acceso mediante el controlador compartido. En navegador se revisan el cierre nativo con Escape, el botón Cerrar, el desplazamiento interno y la visibilidad del pie. [Caso de uso](../04_casos_de_uso/nuestra_historia.md)

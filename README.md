@@ -62,7 +62,7 @@ En una base existente se conservan los registros previos. La carga omite coincid
 | Dirección local | Uso |
 | --- | --- |
 | `http://127.0.0.1:8000/` | Fachada interactiva. Las puertas abren la recepción. |
-| `http://127.0.0.1:8000/recepcion/` | Recepción y menú principal |
+| `http://127.0.0.1:8000/recepcion/` | Recepción, menú principal y diálogo [Nuestra historia](docs/04_casos_de_uso/nuestra_historia.md) |
 | `http://127.0.0.1:8000/mundo-musical/` | Doce artículos educativos con rutas individuales |
 | `http://127.0.0.1:8000/coleccion/` | Galería de cuatro categorías |
 | `http://127.0.0.1:8000/coleccion/guitarras/` | Visor de guitarra y registros actuales |

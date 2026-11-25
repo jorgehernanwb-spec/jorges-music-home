@@ -73,7 +73,6 @@ class RecepcionTests(SimpleTestCase):
     def test_recepcion_tiene_zonas_interactivas_paneles_y_salida(self):
         response = self.client.get(reverse("instrumentos:recepcion"))
         self.assertContains(response, 'aria-label="Explorar instrumentos, guitarra ', count=6)
-        self.assertContains(response, f'href="{reverse("instrumentos:coleccion")}"', count=8)
         self.assertContains(response, 'id="letrero-recepcion"')
         self.assertContains(response, 'aria-label="Abrir Nuestra historia desde el letrero Jorge\'s"')
         self.assertContains(response, 'aria-controls="menu-historia"', count=2)
@@ -86,6 +85,19 @@ class RecepcionTests(SimpleTestCase):
         escena = response.content.decode().split('<div class="recepcion-escena">', 1)[1].split("</div>", 1)[0]
         self.assertIn("recepcion-historia", escena)
         self.assertIn("recepcion-salida", escena)
+
+    def test_nuestra_historia_presenta_pilares_y_accesos_en_el_dialogo_compartido(self):
+        response = self.client.get(reverse("instrumentos:recepcion"))
+        dialogo = response.content.decode().split('id="menu-historia"', 1)[1].split("</dialog>", 1)[0]
+        for contenido in (
+            "Donde la música encuentra su hogar", "Pasión", "Innovación", "Conocimiento",
+            "Nuestro compromiso", 'method="dialog"', 'tabindex="0" role="region"',
+            'aria-labelledby="titulo-historia"', 'autofocus>Cerrar</button>',
+        ):
+            self.assertIn(contenido, dialogo)
+        for destino, etiqueta in (("coleccion", "Explorar instrumentos"), ("mundo_musical", "Mundo Musical")):
+            self.assertIn(f'href="{reverse(f"instrumentos:{destino}")}">{etiqueta}</a>', dialogo)
+        self.assertContains(response, 'class="pie-global"', count=1)
 
     def test_mundo_musical_marca_la_opcion_activa(self):
         destino = reverse("instrumentos:mundo_musical")
@@ -145,7 +157,7 @@ class GaleriaCategoriasTests(SimpleTestCase):
     def test_recepcion_y_las_cuatro_tarjetas_enlazan_sus_destinos(self):
         ruta = reverse("instrumentos:coleccion")
         self.assertContains(
-            self.client.get(reverse("instrumentos:recepcion")), f'href="{ruta}"', count=8,
+            self.client.get(reverse("instrumentos:recepcion")), f'href="{ruta}"', count=9,
         )
         response = self.client.get(ruta)
         self.assertContains(response, "<h1>Nuestra colección</h1>", html=True)

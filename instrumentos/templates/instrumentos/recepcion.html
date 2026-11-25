@@ -46,15 +46,42 @@
     </nav>
 </dialog>
 
-<dialog class="recepcion-panel" id="menu-historia" aria-labelledby="titulo-historia">
-    <div class="recepcion-menu-cabecera">
+<dialog class="recepcion-panel historia-panel" id="menu-historia" aria-labelledby="titulo-historia">
+    <header class="historia-cabecera">
         <h2 id="titulo-historia">Nuestra historia</h2>
         <form method="dialog"><button class="recepcion-control" type="submit" autofocus>Cerrar</button></form>
+    </header>
+    <div class="historia-lectura" tabindex="0" role="region" aria-label="Contenido de Nuestra historia">
+        <div class="historia-portada">
+            <img src="{% static 'instrumentos/img/recepcion-principal.png' %}" width="1448" height="1086" alt="">
+            <p>Donde la música encuentra su hogar</p>
+        </div>
+        <div class="historia-texto">
+            <p>Jorge's Music Home nació de una idea: crear un espacio digital donde descubrir instrumentos fuera mucho más que recorrer un catálogo. Un lugar para explorar, aprender y conectar con la música.</p>
+            <p>Creemos que la música tiene la capacidad de inspirar, conectar personas y despertar la creatividad. Por eso reunimos instrumentos musicales, experiencias interactivas y contenidos educativos en un mismo espacio.</p>
+            <div class="historia-pilares">
+                <section>
+                    <h3>{% include 'instrumentos/recepcion_icono.html' with icono='guitarra' only %}Pasión</h3>
+                    <p>La música como fuente de inspiración y creatividad.</p>
+                </section>
+                <section>
+                    <h3>{% include 'instrumentos/recepcion_icono.html' with icono='disco' only %}Innovación</h3>
+                    <p>Exploración interactiva de instrumentos mediante modelos 3D.</p>
+                </section>
+                <section>
+                    <h3>{% include 'instrumentos/recepcion_icono.html' with icono='libro' only %}Conocimiento</h3>
+                    <p>Historias, datos y aprendizaje a través de Mundo Musical.</p>
+                </section>
+            </div>
+            <section class="historia-compromiso">
+                <h3>Nuestro compromiso</h3>
+                <p>Queremos ofrecer una experiencia clara, cercana e innovadora, donde cada visitante pueda descubrir instrumentos, conocer sus características y aprender algo nuevo sobre el mundo musical.</p>
+            </section>
+        </div>
     </div>
-    <p>En Jorge's Music Home creemos que la música tiene el poder de inspirar, conectar personas y transformar momentos en recuerdos inolvidables.</p>
-    <p>Nuestra pasión por los instrumentos musicales nos impulsa a crear un espacio donde cada persona pueda descubrir nuevas posibilidades, expresar su creatividad y encontrar el sonido que la representa.</p>
-    <h3>Nuestro compromiso</h3>
-    <p>Nuestro compromiso es ofrecer instrumentos de calidad, una selección cuidadosamente presentada y una experiencia cercana para todos los amantes de la música.</p>
-    <p>Jorge's Music Home — Donde comienza tu próxima historia musical.</p>
+    <nav class="historia-accesos" aria-label="Explorar la tienda">
+        <a class="recepcion-control" href="{% url 'instrumentos:coleccion' %}">Explorar instrumentos</a>
+        <a class="recepcion-control" href="{% url 'instrumentos:mundo_musical' %}">Mundo Musical</a>
+    </nav>
 </dialog>
 {% endblock %}
