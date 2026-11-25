@@ -1,0 +1,9 @@
+{% with activa=request.resolver_match.url_name %}
+<nav class="recepcion-menu-enlaces" aria-label="Menú principal">
+    <a href="{% url 'instrumentos:recepcion' %}"{% if activa == 'recepcion' %} aria-current="page"{% endif %}>{% include 'instrumentos/recepcion_icono.html' with icono='casa' only %}Inicio</a>
+    <a href="{% url 'instrumentos:coleccion' %}"{% if activa == 'coleccion' %} aria-current="page"{% endif %}>{% include 'instrumentos/recepcion_icono.html' with icono='guitarra' only %}Instrumentos</a>
+    <a href="{% url 'instrumentos:lista' %}">{% include 'instrumentos/recepcion_icono.html' with icono='libro' only %}Inventario</a>
+    <a href="{% url 'instrumentos:crear' %}">{% include 'instrumentos/recepcion_icono.html' with icono='agregar' only %}Agregar instrumento</a>
+    <a href="{% url 'instrumentos:mundo_musical' %}"{% if activa == 'mundo_musical' %} aria-current="page"{% endif %}>{% include 'instrumentos/recepcion_icono.html' with icono='disco' only %}Mundo musical</a>
+</nav>
+{% endwith %}

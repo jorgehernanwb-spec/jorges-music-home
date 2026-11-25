@@ -1,0 +1,49 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titulo %}Recepción{% endblock %} · JORGE'S MUSIC HOME</title>
+    <link rel="stylesheet" href="{% static 'instrumentos/css/recepcion.css' %}">
+    <link rel="stylesheet" href="{% static 'instrumentos/css/pie-global.css' %}">
+    <script src="{% static 'instrumentos/js/recepcion.js' %}" defer></script>
+</head>
+<body class="pagina-con-pie{% block clase_pagina %}{% endblock %}">
+<div class="recepcion{% block clase_escena %}{% endblock %}">
+    <div class="recepcion-controles">
+        <button class="recepcion-control" type="button" id="abrir-menu"
+                aria-haspopup="dialog" aria-controls="menu-recepcion" aria-expanded="false"
+                data-recepcion-dialogo>
+            <span aria-hidden="true">☰</span> Menú
+        </button>
+        <noscript>
+            <style>#abrir-menu { display: none; }</style>
+            {% include 'instrumentos/recepcion_enlaces.html' %}
+        </noscript>
+    </div>
+    <main class="recepcion-contenido">
+        {% block contenido %}{% endblock %}
+    </main>
+    {% block accesos %}<nav class="recepcion-accesos" aria-label="Accesos rápidos">
+        {% if request.resolver_match.url_name != 'recepcion' %}
+            <a class="recepcion-control" href="{% url 'instrumentos:recepcion' %}">Inicio</a>
+        {% endif %}
+        <a class="recepcion-control" href="{% url 'instrumentos:lista' %}">Inventario</a>
+        <a class="recepcion-control" href="{% url 'instrumentos:crear' %}">Agregar instrumento</a>
+    </nav>{% endblock %}
+</div>
+{% include 'instrumentos/pie_global.html' %}
+
+<dialog class="recepcion-menu" id="menu-recepcion" aria-labelledby="titulo-menu">
+    <div class="recepcion-menu-cabecera">
+        <h2 id="titulo-menu">JORGE’S MUSIC HOME</h2>
+        <form method="dialog">
+            <button class="recepcion-control" type="submit" autofocus>Cerrar</button>
+        </form>
+    </div>
+    {% include 'instrumentos/recepcion_enlaces.html' %}
+</dialog>
+{% block dialogos %}{% endblock %}
+</body>
+</html>

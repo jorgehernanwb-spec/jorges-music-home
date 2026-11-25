@@ -6,16 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>JORGE'S MUSIC HOME</title>
     <link rel="stylesheet" href="{% static 'instrumentos/css/fachada.css' %}">
+    <link rel="stylesheet" href="{% static 'instrumentos/css/pie-global.css' %}">
     <script src="{% static 'instrumentos/js/fachada.js' %}" defer></script>
 </head>
-<body>
+<body class="pagina-con-pie pagina-inmersiva">
 <main class="fachada" aria-label="Fachada de JORGE'S MUSIC HOME">
     <div class="fachada-escena">
         <img class="fachada-imagen"
              src="{% static 'instrumentos/img/fachada-principal.png' %}"
              width="1774" height="887"
              alt="Escaparate con letrero de neón, una batería a la izquierda y guitarras a la derecha.">
-        <a class="fachada-puertas" href="{% url 'instrumentos:lista' %}"
+        <a class="fachada-puertas" href="{% url 'instrumentos:recepcion' %}"
            aria-label="Entrar a la tienda">
             <span class="fachada-interior" aria-hidden="true"></span>
             <span class="fachada-hoja fachada-hoja-izquierda" aria-hidden="true"></span>
@@ -23,5 +24,6 @@
         </a>
     </div>
 </main>
+{% include 'instrumentos/pie_global.html' %}
 </body>
 </html>
