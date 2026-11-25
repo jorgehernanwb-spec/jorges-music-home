@@ -1,0 +1,25 @@
+{% extends 'instrumentos/galeria_base.html' %}
+{% load static %}
+
+{% block titulo %}Nuestra colección{% endblock %}
+{% block contenido %}
+<header class="galeria-titulo">
+    <h1>Nuestra colección</h1>
+</header>
+<ul class="galeria-salas" aria-label="Categorías">
+    {% for ruta, nombre in salas %}
+        <li>
+            <a class="galeria-sala" href="{% url 'instrumentos:coleccion_categoria' ruta %}"
+               aria-labelledby="accion-{{ ruta }} nombre-{{ ruta }}">
+                {% with imagen='instrumentos/img/vitrina_'|add:ruta|add:'.png' %}
+                    <img src="{% static imagen %}" alt="" width="{% if ruta == 'guitarras' %}309{% else %}315{% endif %}" height="434">
+                {% endwith %}
+                <span class="galeria-rotulo">
+                    <span class="galeria-nombre" id="nombre-{{ ruta }}">{{ nombre }}</span>
+                    <span class="galeria-accion" id="accion-{{ ruta }}">Explorar colección</span>
+                </span>
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

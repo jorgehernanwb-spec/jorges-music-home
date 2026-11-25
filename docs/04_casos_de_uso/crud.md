@@ -4,6 +4,10 @@
 
 El **operador del inventario** utiliza el navegador con Django y MariaDB disponibles y con el esquema migrado. Las rutas del inventario actual no requieren autenticación. Las operaciones de escritura se envían por POST con CSRF.
 
+La galería ofrece otro acceso de lectura a la ficha mediante el enlace de detalle. Desde allí se conservan las acciones y rutas de edición y confirmación de eliminación. El alta continúa disponible desde el inventario y la recepción. [Exploración de categorías](galeria.md)
+
+Cada sala consulta MariaDB al abrirse. Después de agregar o eliminar un instrumento, al volver a la sala cambia la cantidad de piezas. Si se edita la marca, la próxima consulta refleja el nuevo acabado y muestra el precio guardado en el formulario.
+
 ## CREATE · Registrar un instrumento
 
 - **Objetivo.** Incorporar un instrumento al catálogo.

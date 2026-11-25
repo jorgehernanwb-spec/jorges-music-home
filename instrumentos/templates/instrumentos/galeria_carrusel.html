@@ -1,0 +1,40 @@
+<section class="galeria-carrusel" aria-label="Exhibición de {{ titulo }}" data-carrusel data-categoria="{{ categoria }}">
+    <p class="galeria-posicion" data-posicion role="status" aria-atomic="true" hidden></p>
+    <div class="galeria-escena" data-escena hidden>
+        <button class="galeria-flecha galeria-flecha--anterior" type="button" data-paso="-1"
+                aria-label="Instrumento anterior" hidden><span aria-hidden="true">‹</span></button>
+        <div class="galeria-modelo" data-modelo>
+            <p data-visor-alternativo role="status">Visor 3D no disponible. Puedes consultar las especificaciones.</p>
+            <canvas data-visor tabindex="0" aria-label="Modelo 3D de {{ titulo }}" aria-describedby="ayuda-visor" hidden></canvas>
+        </div>
+        <button class="galeria-flecha galeria-flecha--siguiente" type="button" data-paso="1"
+                aria-label="Instrumento siguiente" hidden><span aria-hidden="true">›</span></button>
+    </div>
+    <div class="galeria-acciones" data-acciones hidden>
+        <button class="galeria-especificaciones" type="button" data-especificaciones aria-haspopup="dialog">
+            Ver especificaciones
+        </button>
+        <details class="galeria-ajustes" data-visor-controles hidden>
+            <summary>Controles 3D</summary>
+            <div>
+                <button type="button" data-centrar>Restablecer vista</button>
+                <button type="button" data-flotacion aria-pressed="false">Pausar flotación</button>
+            </div>
+        </details>
+        <p id="ayuda-visor" class="galeria-nota" data-visor-nota hidden>Modelo provisional. Arrastra o enfoca el modelo y usa las flechas para girarlo.</p>
+    </div>
+    <dialog class="galeria-dialogo" data-dialogo aria-label="Especificaciones">
+        <div data-ficha></div>
+        <form method="dialog"><button type="submit" autofocus>Cerrar</button></form>
+    </dialog>
+    <ul class="galeria-instrumentos galeria-registros" data-fichas>
+        {% for pieza in acabados %}
+            <li data-acabado="{{ pieza.color }}">
+                <details>
+                    <summary>{{ pieza.instrumento.nombre }} · {{ pieza.instrumento.get_marca_display }}</summary>
+                    {% include 'instrumentos/galeria_ficha.html' with instrumento=pieza.instrumento color=pieza.color only %}
+                </details>
+            </li>
+        {% endfor %}
+    </ul>
+</section>

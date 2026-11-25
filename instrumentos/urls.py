@@ -2,6 +2,7 @@
 from django.urls import path
 from django.views.generic import TemplateView
 from . import views
+from . import galeria
 
 app_name = "instrumentos"
 
@@ -18,15 +19,10 @@ urlpatterns = [
     ),
     path(
         "coleccion/",
-        TemplateView.as_view(
-            template_name="instrumentos/seccion_recepcion.html",
-            extra_context={
-                "titulo": "Instrumentos",
-                "descripcion": "El carrusel de instrumentos está en preparación.",
-            },
-        ),
+        galeria.categorias,
         name="coleccion",
     ),
+    path("coleccion/<slug:categoria>/", galeria.exhibicion, name="coleccion_categoria"),
     path(
         "mundo-musical/",
         TemplateView.as_view(

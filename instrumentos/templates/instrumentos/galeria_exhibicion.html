@@ -1,0 +1,19 @@
+{% extends 'instrumentos/galeria_base.html' %}
+{% load static %}
+
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block clase_pagina %} galeria--sala{% endblock %}
+{% block scripts %}
+    {% if acabados %}<script type="module" src="{% static 'instrumentos/js/galeria-carrusel.mjs' %}"></script>{% endif %}
+{% endblock %}
+{% block contenido %}
+<header class="galeria-titulo">
+    <h1>{{ titulo }}</h1>
+</header>
+{% if acabados %}
+    {% include 'instrumentos/galeria_carrusel.html' %}
+{% else %}
+    <p class="galeria-aviso">Aún no hay instrumentos en esta categoría.</p>
+{% endif %}
+<a class="galeria-volver" href="{% url 'instrumentos:coleccion' %}">Volver a las categorías</a>
+{% endblock %}

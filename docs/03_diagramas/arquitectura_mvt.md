@@ -7,16 +7,27 @@ flowchart LR
     subgraph cliente["Navegador"]
         navegador["Interfaz HTML y CSS"]
         js["validaciones.js"]
+        webgl["Visor WebGL compartido"]
+        geometria["Configuración y mallas por categoría"]
+        carrusel["Carrusel y diálogo de especificaciones"]
         js -->|Controla los campos| navegador
+        webgl -->|Dibuja y gira el prototipo| navegador
+        carrusel -->|Aplica acabado del registro| webgl
+        geometria -->|Proporciona la malla base| webgl
+        carrusel -->|Presenta la ficha seleccionada| navegador
     end
     subgraph django["Aplicación Django"]
         rutas["URLs del proyecto y de instrumentos"]
         vistas["Funciones de views.py"]
+        galeria["Funciones de galeria.py"]
         formulario["InstrumentoForm"]
         modelo["Modelo Instrumento"]
         orm["ORM de Django"]
         plantillas["Templates HTML"]
         rutas -->|Despacha| vistas
+        rutas -->|"Portada y salas"| galeria
+        galeria -->|"Lee por categoría"| modelo
+        galeria -->|"Vitrinas y datos de la sala"| plantillas
         vistas -->|Alta y edición| formulario
         vistas -->|Consulta y borrado| modelo
         formulario -->|Valida y guarda| modelo

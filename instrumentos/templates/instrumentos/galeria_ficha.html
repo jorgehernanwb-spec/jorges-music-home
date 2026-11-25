@@ -1,0 +1,19 @@
+{% load instrumentos_formato %}
+<article>
+    <h2>{{ instrumento.nombre }}</h2>
+    <dl class="galeria-ficha">
+        <div><dt>Marca</dt><dd>{{ instrumento.get_marca_display }}</dd></div>
+        <div><dt>Categoría</dt><dd>{{ instrumento.get_categoria_display }}</dd></div>
+        <div><dt>Precio</dt><dd>{{ instrumento.precio|clp }} CLP</dd></div>
+        <div><dt>Stock</dt><dd>{{ instrumento.stock }} unidades</dd></div>
+        <div>
+            <dt>Acabado</dt>
+            <dd>{% if color %}<span class="galeria-muestra" style="--acabado: {{ color }}" aria-hidden="true"></span>
+                {{ instrumento.get_marca_display }} ({{ color }}){% else %}Acabado del prototipo{% endif %}</dd>
+        </div>
+        <div class="galeria-descripcion">
+            <dt>Modelo y descripción</dt><dd>{{ instrumento.descripcion|default:"Sin descripción." }}</dd>
+        </div>
+    </dl>
+    <a href="{% url 'instrumentos:detalle' instrumento.pk %}">Abrir ficha de inventario</a>
+</article>

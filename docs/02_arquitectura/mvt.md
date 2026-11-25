@@ -7,8 +7,8 @@
 | Componente | Responsabilidad en el proyecto |
 | --- | --- |
 | Modelo | `Instrumento` define los campos persistentes, las opciones de marca y categoría, los validadores y las restricciones. El ORM traduce operaciones sobre instancias y consultas a SQL. |
-| Vista | Las funciones de `views.py` coordinan la solicitud, la consulta por identificador, el formulario, los mensajes y la respuesta. |
-| Plantilla | Las páginas del inventario heredan de `base.html`. Alta y edición incluyen el mismo fragmento de campos. La fachada usa una plantilla independiente con sus propios estilos y JavaScript. |
+| Vista | `views.py` coordina el CRUD. `galeria.py` sirve la portada de la colección y consulta los registros por categoría mediante el ORM. |
+| Plantilla | El inventario hereda de `base.html` y comparte el fragmento de campos entre alta y edición. La colección usa `galeria_base.html` y plantillas separadas para vitrinas y salas. |
 | Formulario | `InstrumentoForm` es el `ModelForm` compartido por alta y edición. Convierte los datos recibidos, valida campos y vincula el resultado al modelo. |
 | URLs | La configuración del proyecto incluye las rutas de la aplicación. Cada ruta CRUD tiene un nombre dentro del espacio `instrumentos`. |
 
@@ -18,7 +18,8 @@
 | --- | --- | --- |
 | `/` | `inicio` | `TemplateView` muestra la fachada. El enlace de las puertas lleva a `/recepcion/`. |
 | `/recepcion/` | `recepcion` | Muestra la recepción y el menú principal. |
-| `/coleccion/` | `coleccion` | Entrada de Instrumentos, sección en preparación. |
+| `/coleccion/` | `coleccion` | Muestra las cuatro vitrinas con los nombres del modelo. |
+| `/coleccion/<slug:categoria>/` | `coleccion_categoria` | GET y HEAD muestran la sala y sus registros actuales. Las cuatro salas comparten visor y carrusel. Un slug desconocido devuelve 404. |
 | `/mundo-musical/` | `mundo_musical` | Entrada de la sección educativa en preparación. |
 | `/instrumentos/` | `lista` | El GET muestra los instrumentos ordenados por nombre. |
 | `/instrumentos/nuevo/` | `crear` | El GET muestra el formulario vacío. El POST intenta crear el instrumento. |
@@ -26,7 +27,7 @@
 | `/instrumentos/<int:pk>/editar/` | `editar` | El GET carga la instancia. El POST intenta actualizarla. Un identificador inexistente devuelve 404. |
 | `/instrumentos/<int:pk>/eliminar/` | `eliminar` | El GET muestra la confirmación. El POST ejecuta el borrado. Un identificador inexistente devuelve 404. |
 
-En lectura, `Instrumento.objects.all().order_by("nombre")` prepara la consulta del catálogo y `get_object_or_404(Instrumento, pk=pk)` obtiene la fila de la ficha, edición o borrado. La vista pasa los resultados a la plantilla con `render()`.
+En lectura, el inventario ordena por nombre y clave primaria y puede filtrar por búsqueda, categoría y stock. `get_object_or_404(Instrumento, pk=pk)` obtiene la fila de la ficha, edición o borrado. La vista de exhibición traduce el slug a una clave interna (por ejemplo, `baterias` a `Percusion`) y filtra por categoría. Django crea las fichas HTML y obtiene el acabado de cada registro desde `presentacion.py`. El carrusel navega esas fichas sin solicitudes nuevas. El visor WebGL dibuja una malla base por sala, seleccionada mediante la configuración del modelo.
 
 En alta, la vista construye `InstrumentoForm(request.POST)`. En edición, usa `InstrumentoForm(request.POST, instance=instrumento)`, de modo que `save()` actualice la fila seleccionada. Ambas ramas llaman a `is_valid()` antes de guardar. Un formulario inválido vuelve a la misma pantalla con sus errores. Si el guardado tiene éxito, Django registra un mensaje con `messages.success()` y redirige a `instrumentos:lista`.
 
@@ -50,3 +51,4 @@ Por ejemplo, `PrecioCLPField.to_python()` usa `analizar_precio()` para convertir
 - [Modelo](../../instrumentos/models.py) · [Formulario](../../instrumentos/forms.py) · [Validadores](../../instrumentos/validaciones.py) · [Filtro CLP](../../instrumentos/templatetags/instrumentos_formato.py)
 - [Configuración](../../tienda_musica/settings.py) · [Migraciones](../../instrumentos/migrations/) · [Plantillas](../../instrumentos/templates/instrumentos/) · [JavaScript](../../instrumentos/static/instrumentos/js/validaciones.js)
 - [Diagrama MVT](../03_diagramas/arquitectura_mvt.md) · [Reglas de campos](../06_validaciones/reglas_campos.md)
+- [Vistas de galería](../../instrumentos/galeria.py) · [Casos de uso de la galería](../04_casos_de_uso/galeria.md)

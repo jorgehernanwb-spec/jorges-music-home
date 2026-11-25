@@ -63,6 +63,8 @@ En una base existente se conservan los registros previos. La carga omite coincid
 | --- | --- |
 | `http://127.0.0.1:8000/` | Fachada interactiva. Las puertas abren la recepción. |
 | `http://127.0.0.1:8000/recepcion/` | Recepción y menú principal |
+| `http://127.0.0.1:8000/coleccion/` | Galería de cuatro categorías |
+| `http://127.0.0.1:8000/coleccion/guitarras/` | Visor de guitarra y registros actuales |
 | `http://127.0.0.1:8000/instrumentos/` | Catálogo y acceso a las acciones |
 | `http://127.0.0.1:8000/instrumentos/nuevo/` | Formulario de alta |
 
@@ -86,11 +88,15 @@ Desde cada tarjeta puedes abrir la ficha (**READ**), editar el registro precarga
 ```powershell
 python manage.py check
 python manage.py test
-node --test instrumentos/tests_js/validaciones.test.js instrumentos/tests_js/fachada.test.js instrumentos/tests_js/recepcion.test.js instrumentos/tests_js/acabado-marca.test.js
+node --preserve-symlinks --preserve-symlinks-main --test instrumentos/tests_js
 ```
 
 Django crea y retira un esquema de pruebas separado. Las pruebas JavaScript usan eventos simulados y se complementan con la comprobación manual descrita en la [matriz de validaciones](docs/07_pruebas/matriz_validaciones.md). Consulta también las [reglas de campos](docs/06_validaciones/reglas_campos.md).
 
 ## Uso local y académico
+
+La rama `feature/galeria-3d` parte del inventario vintage (`00440612826423e47646b62173e16d4b2e956c13`). Integra primero ese inventario al preparar la integración de la galería con `main`.
+
+Desde **Instrumentos** en la recepción se accede a **Nuestra colección**. Las cuatro salas comparten un carrusel circular con registros actuales de MariaDB, giro independiente y diálogo de especificaciones. Cada categoría tiene una malla WebGL provisional y aplica el acabado de marca únicamente a las piezas pintadas. Los datos siguen disponibles si WebGL o JavaScript fallan. [Rutas, alcance de los modelos y revisión visual](docs/04_casos_de_uso/galeria.md)
 
 Ejecuta la demostración en `127.0.0.1` y usa una base con datos de ejemplo. Esta versión no está preparada para despliegue público. El servidor de desarrollo, el modo de depuración y las acciones de inventario sin inicio de sesión están destinados a la demostración local.
