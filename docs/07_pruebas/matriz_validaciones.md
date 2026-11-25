@@ -17,3 +17,27 @@ Ejecuta `node --test instrumentos/tests_js/validaciones.test.js` para comprobar 
 Para la comprobación manual en Edge, recarga alta y edición con `Ctrl+F5`. En precio, escribe `100000` y verifica que aparezca `$100.000`. Intenta añadir una letra y un séptimo dígito. Selecciona el importe y pega `1.50` o `1000000`. El valor previo debe permanecer y el aviso debe mostrarse. Pega `$999.999` y comprueba que se acepta. En stock, escribe `999` e intenta añadir una letra y un cuarto dígito. Selecciona el valor y pega `1000` o `12a`, que deben rechazarse completos. Prueba borrar, seleccionar y reemplazar por un valor válido en ambos campos.
 
 Las ocho pruebas de JMH-001 siguen cubriendo creación, consulta, 404, edición precargada, edición válida e inválida, confirmación sin borrado por GET y borrado por POST con CSRF. Las pruebas adicionales verifican que las entradas inválidas de alta o edición no cambien la fila existente ni creen filas nuevas, y que MariaDB rechace escrituras directas fuera de los límites de nombre, descripción, precio y stock.
+
+## Pruebas de la galería
+
+La ficha de Inventario tiene cobertura en las cuatro categorías con una plantilla compartida, precio CLP, descripción de 100 caracteres y los enlaces Ver en 3D, Editar instrumento y Volver al catálogo. Se comprueba el stock cero, singular y plural en la ficha y el aviso de stock bajo en el listado.
+
+| Requisito | Evidencia automatizada |
+| --- | --- |
+| Acceso y cuatro vitrinas | Django comprueba los accesos de recepción, destinos, nombres, PNG disponibles y textos de acción. |
+| Consulta sin cambios | Django compara los registros antes y después y verifica las claves internas, las salas vacías y el 404. |
+| Visor y alternativa | Node comprueba que GLTFLoader lea los cuatro archivos y asocie sus texturas, que el modelo quede centrado y que el aviso aparezca sin WebGL 2. Django comprueba la ficha y la tabla de marcas. |
+| Carrusel circular y transición | Node comprueba cinco registros, retorno circular, desplazamiento y movimiento reducido. |
+| Especificaciones y estados límite | Django comprueba datos reales, acabados, precio CLP y salas con cero o un registro. Node comprueba la sincronización con la selección, el cierre por clic exterior y el retorno de foco. |
+| Cuatro salas y cambios del CRUD | Django comprueba las cuatro categorías y que agregar un quinto registro, editar su marca y eliminarlo se refleje en su sala. Node verifica los cinco acabados únicamente en los nodos autorizados. Khronos glTF Validator revisa la conformidad de los cuatro GLB. |
+| Acceso directo desde Inventario | Django comprueba enlaces en el listado y en detalle, redirección por ID vigente, cambio de categoría, datos editados, agotados, eliminados e IDs ajenos o no válidos. Node verifica que el visor y el diálogo se inicialicen en la selección solicitada. |
+
+## Mundo musical
+
+Django comprueba la entrada del menú, los doce enlaces nativos, cuatro artículos por tema, la existencia de sus imágenes, el contenido distintivo de cada artículo, el área de lectura enfocable, el regreso, el pie único, el 404 y el rechazo de POST. Estas pruebas usan `SimpleTestCase` porque las vistas editoriales no consultan MariaDB. La cuadrícula, el foco visible y el desplazamiento interno se revisan en Edge, según el [caso de uso](../04_casos_de_uso/mundo_musical.md).
+
+La revisión de distribución en escritorio y móvil, de foco visible y de rotación renderizada se realiza siguiendo el [caso de uso de la galería](../04_casos_de_uso/galeria.md).
+
+## Nuestra historia
+
+Django comprueba que ambos accesos de Recepción apuntan al mismo diálogo, sus pilares, ambos destinos y el pie global único. Node comprueba la apertura y el retorno del foco a cada acceso mediante el controlador compartido. En navegador se revisan el cierre nativo con Escape, el botón Cerrar, el desplazamiento interno y la visibilidad del pie. [Caso de uso](../04_casos_de_uso/nuestra_historia.md)

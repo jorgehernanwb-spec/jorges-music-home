@@ -34,6 +34,7 @@ local_settings.py
 # Material personal de preparación para la defensa
 /docs/08_defensa/
 /defensa_privada/
+/recursos_3d/
 
 # Bases locales y respaldos
 *.sqlite*

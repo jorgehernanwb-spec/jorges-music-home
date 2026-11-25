@@ -1,12 +1,20 @@
 # Diagrama de casos de uso
 
-**Objetivo.** Mostrar las acciones del operador dentro del inventario web y dónde termina el alcance del sistema.
+**Objetivo.** Mostrar las acciones del operador en la galería y el inventario web.
 
 ```mermaid
 flowchart LR
-    actor["Operador del inventario"]
-    subgraph inventario["JORGE'S MUSIC HOME · Inventario web"]
-        catalogo(["Consultar catálogo"])
+    actor["Persona que utiliza la tienda"]
+    subgraph inventario["JORGE'S MUSIC HOME"]
+        galeria(["Explorar categorías"])
+        sala(["Consultar instrumentos de una categoría"])
+        girar(["Girar el modelo 3D de la categoría"])
+        alternar(["Recorrer instrumentos de la sala"])
+        leerMundo(["Consultar Mundo musical"])
+        leerHistoria(["Consultar Nuestra historia"])
+        verEnTresD(["Abrir un registro del inventario en 3D"])
+        especificaciones(["Ver especificaciones de la selección"])
+        catalogo(["Consultar inventario"])
         detalle(["Consultar detalle"])
         registrar(["Registrar instrumento"])
         editar(["Editar instrumento"])
@@ -14,6 +22,14 @@ flowchart LR
         confirmar(["Confirmar eliminación"])
         eliminar -. requiere .-> confirmar
     end
+    actor --- galeria
+    actor --- sala
+    actor --- girar
+    actor --- alternar
+    actor --- leerMundo
+    actor --- leerHistoria
+    actor --- verEnTresD
+    actor --- especificaciones
     actor --- catalogo
     actor --- detalle
     actor --- registrar
@@ -21,7 +37,7 @@ flowchart LR
     actor --- eliminar
 ```
 
-El operador representa a la persona que utiliza la interfaz local. El CRUD actual está disponible sin iniciar sesión. El recuadro agrupa las acciones del inventario y el vínculo punteado indica que el borrado requiere confirmar el envío. Los métodos y casos alternativos están en el [documento de casos de uso](../04_casos_de_uso/crud.md).
+La exploración abre cuatro salas de solo lectura. Cada una permite recorrer sus registros y girar su GLB cuando está disponible. El vínculo punteado indica que el borrado requiere confirmación. [Casos de uso del inventario](../04_casos_de_uso/crud.md) · [Casos de uso de la galería](../04_casos_de_uso/galeria.md)
 
 ## Referencias
 

@@ -7,16 +7,35 @@ flowchart LR
     subgraph cliente["Navegador"]
         navegador["Interfaz HTML y CSS"]
         js["validaciones.js"]
+        webgl["Visor Three.js y GLTFLoader"]
+        geometria["GLB estático por categoría"]
+        carrusel["Carrusel y diálogo de especificaciones"]
         js -->|Controla los campos| navegador
+        webgl -->|Dibuja y gira el modelo GLB de la categoría| navegador
+        carrusel -->|Aplica acabado del registro| webgl
+        geometria -->|Proporciona geometría y materiales| webgl
+        carrusel -->|Presenta la ficha seleccionada| navegador
     end
     subgraph django["Aplicación Django"]
         rutas["URLs del proyecto y de instrumentos"]
+        entrada["TemplateView de Fachada y Recepción"]
         vistas["Funciones de views.py"]
+        galeria["Funciones de galeria.py"]
+        mundo["Vistas de Mundo musical"]
+        articulos["Artículos editoriales versionados"]
         formulario["InstrumentoForm"]
         modelo["Modelo Instrumento"]
         orm["ORM de Django"]
         plantillas["Templates HTML"]
         rutas -->|Despacha| vistas
+        rutas -->|"Inicio y Recepción"| entrada
+        entrada -->|"Escenas y diálogo Nuestra historia"| plantillas
+        rutas -->|"Portada y salas"| galeria
+        rutas -->|"Portada y lectura"| mundo
+        mundo -->|"Lee contenido fijo"| articulos
+        mundo -->|"Artículo o portada"| plantillas
+        galeria -->|"Lee por categoría"| modelo
+        galeria -->|"Vitrinas y datos de la sala"| plantillas
         vistas -->|Alta y edición| formulario
         vistas -->|Consulta y borrado| modelo
         formulario -->|Valida y guarda| modelo

@@ -4,6 +4,7 @@ from importlib import import_module
 
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
+from django.contrib.staticfiles import finders
 from django.db import IntegrityError, connection, transaction
 from django.db.migrations.executor import MigrationExecutor
 from django.test import Client, SimpleTestCase, TestCase
@@ -72,7 +73,6 @@ class RecepcionTests(SimpleTestCase):
     def test_recepcion_tiene_zonas_interactivas_paneles_y_salida(self):
         response = self.client.get(reverse("instrumentos:recepcion"))
         self.assertContains(response, 'aria-label="Explorar instrumentos, guitarra ', count=6)
-        self.assertContains(response, f'href="{reverse("instrumentos:coleccion")}"', count=8)
         self.assertContains(response, 'id="letrero-recepcion"')
         self.assertContains(response, 'aria-label="Abrir Nuestra historia desde el letrero Jorge\'s"')
         self.assertContains(response, 'aria-controls="menu-historia"', count=2)
@@ -86,20 +86,258 @@ class RecepcionTests(SimpleTestCase):
         self.assertIn("recepcion-historia", escena)
         self.assertIn("recepcion-salida", escena)
 
-    def test_secciones_en_preparacion_son_distintas_y_marcan_la_opcion_activa(self):
-        for ruta, titulo in (("coleccion", "Instrumentos"), ("mundo_musical", "Mundo musical")):
-            with self.subTest(ruta=ruta):
-                destino = reverse(f"instrumentos:{ruta}")
-                response = self.client.get(destino)
-                self.assertContains(response, f"<h1>{titulo}</h1>", html=True)
-                self.assertRegex(
-                    response.content.decode(),
-                    rf'(?s)<a href="{destino}" aria-current="page">\s*<svg[^>]*>.*?</svg>\s*{titulo}</a>',
-                )
-                self.assertContains(
-                    response, f'<a class="recepcion-control" href="{reverse("instrumentos:recepcion")}">Inicio</a>',
-                    html=True,
-                )
+    def test_nuestra_historia_presenta_pilares_y_accesos_en_el_dialogo_compartido(self):
+        response = self.client.get(reverse("instrumentos:recepcion"))
+        dialogo = response.content.decode().split('id="menu-historia"', 1)[1].split("</dialog>", 1)[0]
+        for contenido in (
+            "Donde la música encuentra su hogar", "Pasión", "Innovación", "Conocimiento",
+            "Nuestro compromiso", 'method="dialog"', 'tabindex="0" role="region"',
+            'aria-labelledby="titulo-historia"', 'autofocus>Cerrar</button>',
+        ):
+            self.assertIn(contenido, dialogo)
+        for destino, etiqueta in (("coleccion", "Explorar instrumentos"), ("mundo_musical", "Mundo Musical")):
+            self.assertIn(f'href="{reverse(f"instrumentos:{destino}")}">{etiqueta}</a>', dialogo)
+        self.assertContains(response, 'class="pie-global"', count=1)
+
+    def test_mundo_musical_marca_la_opcion_activa(self):
+        destino = reverse("instrumentos:mundo_musical")
+        response = self.client.get(destino)
+        self.assertContains(response, "<h1>Mundo musical</h1>", html=True)
+        self.assertContains(response, f'<a href="{destino}" aria-current="page">Mundo musical</a>', html=True)
+        self.assertContains(
+            response, f'<a href="{reverse("instrumentos:recepcion")}">Recepción</a>',
+            html=True,
+        )
+
+
+class MundoMusicalTests(SimpleTestCase):
+    def test_portada_tiene_doce_enlaces_nativos_y_cuatro_articulos_por_tema(self):
+        from .contenido_musical import ARTICULOS
+
+        portada = self.client.get(reverse("instrumentos:mundo_musical"))
+        self.assertContains(portada, 'class="mundo-tarjeta"', count=12)
+        self.assertEqual(Counter(pieza.tema for pieza in ARTICULOS.values()), {
+            "Instrumentos": 4, "Historia y acontecimientos": 4, "Tecnología y curiosidades": 4,
+        })
+        for slug, pieza in ARTICULOS.items():
+            ruta = reverse("instrumentos:mundo_articulo", args=[slug])
+            self.assertContains(portada, f'<a class="mundo-tarjeta" href="{ruta}">')
+            imagen = f"instrumentos/img/mundo/{slug}.jpg"
+            self.assertContains(portada, imagen)
+            self.assertIsNotNone(finders.find(imagen))
+            self.assertContains(portada, pieza.titulo)
+        self.assertContains(portada, 'class="pie-global"', count=1)
+
+    def test_cada_articulo_abre_su_contenido_fuentes_y_enlace_de_regreso(self):
+        temas = {
+            "guitarra": "Antonio de Torres", "bajo": "Precision Bass", "teclado": "octava",
+            "bateria": "charles", "fonografo": "John Kruesi", "vinilo": "33⅓",
+            "woodstock": "Bethel", "hip-hop": "Kool Herc", "walkman": "TPS-L2",
+            "midi": "Note On", "gusanos-musicales": "Jakubowski", "la-440": "880 Hz",
+        }
+        raiz = reverse("instrumentos:mundo_musical")
+        for slug, texto in temas.items():
+            with self.subTest(slug=slug):
+                respuesta = self.client.get(reverse("instrumentos:mundo_articulo", args=[slug]))
+                self.assertContains(respuesta, texto)
+                self.assertContains(respuesta, "<h2>Fuentes</h2>", html=True)
+                self.assertContains(respuesta, 'tabindex="0" aria-labelledby="mundo-titulo"')
+                self.assertContains(respuesta, f'<a class="mundo-volver" href="{raiz}">Volver a Mundo Musical</a>', html=True)
+                self.assertContains(respuesta, 'class="pie-global"', count=1)
+                self.assertNotContains(respuesta, 'class="mundo-tarjeta"')
+        self.assertContains(self.client.get(raiz), 'class="mundo-tarjeta"', count=12)
+
+    def test_articulo_desconocido_y_metodos_de_escritura(self):
+        raiz = reverse("instrumentos:mundo_musical")
+        self.assertEqual(self.client.get(f"{raiz}no-existe/").status_code, 404)
+        self.assertEqual(self.client.post(f"{raiz}guitarra/").status_code, 405)
+
+
+class GaleriaCategoriasTests(SimpleTestCase):
+    def test_recepcion_y_las_cuatro_tarjetas_enlazan_sus_destinos(self):
+        ruta = reverse("instrumentos:coleccion")
+        self.assertContains(
+            self.client.get(reverse("instrumentos:recepcion")), f'href="{ruta}"', count=9,
+        )
+        response = self.client.get(ruta)
+        self.assertContains(response, "<h1>Nuestra colección</h1>", html=True)
+        self.assertContains(response, 'class="galeria-sala"', count=4)
+        self.assertContains(response, "Explorar colección", count=4)
+        self.assertNotContains(response, "galeria-icono")
+        for slug, nombre in (
+            ("guitarras", "Guitarras"), ("bajos", "Bajos"),
+            ("teclados", "Teclados"), ("baterias", "Baterías"),
+        ):
+            self.assertContains(response, f'href="{ruta}{slug}/"')
+            self.assertContains(response, f'id="nombre-{slug}">{nombre}</span>')
+            self.assertContains(response, f'aria-labelledby="accion-{slug} nombre-{slug}"')
+            ruta_imagen = f"instrumentos/img/vitrina_{slug}.png"
+            self.assertContains(response, ruta_imagen)
+            self.assertIsNotNone(finders.find(ruta_imagen))
+
+    def test_categoria_desconocida_y_escrituras_se_rechazan(self):
+        self.assertEqual(self.client.get("/coleccion/percusion/").status_code, 404)
+        self.assertEqual(self.client.post("/coleccion/guitarras/").status_code, 405)
+
+
+class GaleriaExhibicionTests(TestCase):
+    def test_ficha_premium_comun_por_categoria_con_datos_y_acciones(self):
+        for clave, etiqueta in Instrumento.CATEGORIAS:
+            with self.subTest(categoria=clave):
+                instrumento = Instrumento.objects.filter(categoria=clave).first()
+                instrumento.descripcion = "Á" * 100
+                instrumento.save(update_fields=["descripcion"])
+                detalle = self.client.get(reverse("instrumentos:detalle", args=[instrumento.pk]))
+                self.assertTemplateUsed(detalle, "instrumentos/detalle.html")
+                self.assertContains(detalle, 'class="ficha-premium"')
+                self.assertContains(detalle, "data-clave-de-sol", count=1)
+                self.assertContains(detalle, f'<h1 id="titulo-instrumento">{instrumento.nombre}</h1>', html=True)
+                precio = f"${instrumento.precio:,}".replace(",", ".")
+                for dato in (instrumento.marca, etiqueta, f"{precio} CLP", instrumento.descripcion):
+                    self.assertContains(detalle, dato)
+                for nombre, argumentos in (
+                    ("coleccion_instrumento", [instrumento.pk]),
+                    ("editar", [instrumento.pk]),
+                    ("lista", []),
+                ):
+                    self.assertContains(detalle, f'href="{reverse(f"instrumentos:{nombre}", args=argumentos)}"')
+
+    def test_inventario_y_fichas_enlazan_al_registro_exacto_en_las_cuatro_salas(self):
+        inventario = self.client.get(reverse("instrumentos:lista"))
+        for slug, clave in (
+            ("guitarras", "Guitarras"), ("bajos", "Bajos"),
+            ("teclados", "Teclados"), ("baterias", "Percusion"),
+        ):
+            with self.subTest(slug=slug):
+                instrumento = Instrumento.objects.filter(categoria=clave).order_by("nombre", "pk")[1]
+                enlace = reverse("instrumentos:coleccion_instrumento", args=[instrumento.pk])
+                self.assertContains(inventario, f'href="{enlace}"')
+                detalle = self.client.get(reverse("instrumentos:detalle", args=[instrumento.pk]))
+                self.assertContains(detalle, f'href="{enlace}"')
+                self.assertContains(detalle, "Ver en 3D")
+                response = self.client.get(enlace, follow=True)
+                self.assertEqual(response.redirect_chain, [(f"/coleccion/{slug}/?instrumento={instrumento.pk}", 302)])
+                self.assertContains(response, 'data-indice="1"')
+                self.assertContains(response, "<details open>", count=1)
+                self.assertEqual(response.context["acabados"][1]["instrumento"], instrumento)
+
+    def test_seleccion_invalida_o_ajena_conserva_la_sala(self):
+        bajo = Instrumento.objects.filter(categoria="Bajos").first()
+        for dato in ("a", "99999999", str(bajo.pk)):
+            with self.subTest(dato=dato):
+                respuesta = self.client.get("/coleccion/guitarras/", {"instrumento": dato})
+                self.assertContains(respuesta, 'data-indice="0"')
+                self.assertContains(respuesta, "El instrumento solicitado no está en esta sala.")
+        self.assertRedirects(
+            self.client.get(reverse("instrumentos:coleccion_instrumento", args=[99999999])),
+            reverse("instrumentos:coleccion"),
+        )
+
+    def test_las_cuatro_salas_tienen_sus_recursos_glb_locales(self):
+        for archivo in (
+            "solid-body-electric-guitar.glb", "four-string-bass-guitar.glb",
+            "88-key-keyboard-instrument.glb", "five-piece-drum-kit.glb",
+        ):
+            with self.subTest(archivo=archivo):
+                self.assertIsNotNone(finders.find(f"instrumentos/modelos/{archivo}"))
+        self.assertIsNotNone(finders.find("instrumentos/vendor/three-0.180.0/GLTFLoader.mjs"))
+        self.assertContains(
+            self.client.get("/coleccion/baterias/"), "Batería acústica representativa de la categoría.",
+        )
+
+    def test_categorias_consultan_los_registros_en_mariadb_sin_modificarlos(self):
+        before = list(Instrumento.objects.order_by("pk").values())
+        for slug, clave in (
+            ("guitarras", "Guitarras"), ("bajos", "Bajos"),
+            ("teclados", "Teclados"), ("baterias", "Percusion"),
+        ):
+            with self.subTest(slug=slug):
+                response = self.client.get(f"/coleccion/{slug}/")
+                esperado = Instrumento.objects.filter(categoria=clave).order_by("nombre", "pk")
+                self.assertQuerySetEqual(response.context["instrumentos"], esperado)
+                for instrumento in esperado:
+                    detalle = reverse("instrumentos:detalle", args=[instrumento.pk])
+                    self.assertContains(response, f'href="{detalle}"')
+                self.assertContains(response, f'data-categoria="{slug}"')
+                self.assertContains(response, "galeria-carrusel.mjs")
+                self.assertContains(response, "Ver especificaciones")
+                self.assertContains(response, 'class="pie-global"', count=1)
+                self.assertContains(response, "data-acabado=", count=esperado.count())
+        self.assertEqual(list(Instrumento.objects.order_by("pk").values()), before)
+
+    def test_categoria_vacia_conserva_la_navegacion(self):
+        Instrumento.objects.all().delete()
+        for slug in ("guitarras", "bajos", "teclados", "baterias"):
+            with self.subTest(slug=slug):
+                response = self.client.get(f"/coleccion/{slug}/")
+                self.assertContains(response, "Aún no hay instrumentos en esta categoría.")
+                self.assertContains(response, 'href="/coleccion/"')
+                self.assertNotContains(response, "data-carrusel")
+
+    def test_guitarras_entrega_un_estado_alternativo_y_colores_centralizados(self):
+        from .presentacion import COLORES_MARCA
+
+        response = self.client.get("/coleccion/guitarras/")
+        self.assertContains(response, 'data-visor-alternativo role="status"')
+        self.assertContains(response, "Visor 3D no disponible.")
+        self.assertContains(response, "galeria-carrusel.mjs")
+        self.assertContains(response, "Ver especificaciones")
+        self.assertContains(response, 'aria-haspopup="dialog"')
+        self.assertContains(response, "<form method=\"dialog\">")
+        self.assertNotContains(response, "guitarra-acabado")
+        for pieza in response.context["acabados"]:
+            instrumento = pieza["instrumento"]
+            self.assertEqual(pieza["color"], COLORES_MARCA[instrumento.marca])
+            self.assertContains(response, f'data-acabado="{pieza["color"]}"')
+            self.assertContains(response, instrumento.descripcion)
+            self.assertContains(response, f"{instrumento.stock} unidades")
+        self.assertContains(response, "$189.990 CLP")
+
+    def test_guitarras_con_cero_o_un_registro(self):
+        guitarras = Instrumento.objects.filter(categoria="Guitarras")
+        primera = guitarras.first()
+        guitarras.exclude(pk=primera.pk).delete()
+        response = self.client.get("/coleccion/guitarras/")
+        self.assertContains(response, "data-acabado", count=1)
+        self.assertContains(response, primera.descripcion)
+        guitarras.delete()
+        response = self.client.get("/coleccion/guitarras/")
+        self.assertContains(response, "Aún no hay instrumentos en esta categoría.")
+        self.assertNotContains(response, "data-carrusel")
+
+    def test_sala_refleja_alta_edicion_y_eliminacion_del_inventario(self):
+        from .presentacion import COLORES_MARCA
+
+        datos = {
+            "nombre": "Bajo de prueba", "marca": "Fender", "categoria": "Bajos",
+            "precio": "123456", "stock": 8, "descripcion": "Modelo de prueba.",
+        }
+        ruta = "/coleccion/bajos/"
+        self.assertRedirects(self.client.post(reverse("instrumentos:crear"), datos), reverse("instrumentos:lista"))
+        bajo = Instrumento.objects.get(nombre=datos["nombre"])
+        self.assertContains(self.client.get(ruta), "data-acabado=", count=5)
+        detalle = reverse("instrumentos:detalle", args=[bajo.pk])
+        datos.update(nombre="Bajo actualizado", marca="Ibanez", precio="234567",
+                     stock=0, descripcion="Detalle actualizado.", categoria="Guitarras")
+        editar = reverse("instrumentos:editar", args=[bajo.pk])
+        self.assertRedirects(self.client.post(editar, datos), reverse("instrumentos:lista"))
+        self.assertContains(self.client.get(ruta), "data-acabado=", count=4)
+        acceso = reverse("instrumentos:coleccion_instrumento", args=[bajo.pk])
+        self.assertRedirects(self.client.get(acceso), f"/coleccion/guitarras/?instrumento={bajo.pk}")
+        response = self.client.get(acceso, follow=True)
+        pieza = next(pieza for pieza in response.context["acabados"] if pieza["instrumento"].pk == bajo.pk)
+        self.assertEqual(pieza["color"], COLORES_MARCA["Ibanez"])
+        self.assertEqual(pieza["instrumento"].precio, 234567)
+        self.assertContains(response, "$234.567 CLP")
+        self.assertContains(response, "Bajo actualizado · Ibanez · Sin stock")
+        self.assertContains(response, "Detalle actualizado.")
+        self.assertContains(response, "<dd>Sin stock</dd>", html=True)
+        eliminar = reverse("instrumentos:eliminar", args=[bajo.pk])
+        self.assertRedirects(self.client.post(eliminar), reverse("instrumentos:lista"))
+        self.assertRedirects(self.client.get(acceso), reverse("instrumentos:coleccion"))
+        response = self.client.get("/coleccion/guitarras/", {"instrumento": bajo.pk})
+        self.assertContains(response, "data-acabado=", count=4)
+        self.assertNotContains(response, f'href="{detalle}"')
 
 
 class CatalogoInicialTests(TestCase):
@@ -629,8 +867,10 @@ class ValidacionesInstrumentoTests(TestCase):
         for stock, estado in ((0, "Sin stock"), (1, "Stock bajo"), (2, "Stock bajo"), (3, "Disponible")):
             with self.subTest(stock=stock):
                 Instrumento.objects.filter(pk=self.instrumento.pk).update(stock=stock)
-                for ruta in rutas:
-                    self.assertContains(self.client.get(ruta), estado)
+                self.assertContains(self.client.get(rutas[0]), estado)
+                unidades = "unidad" if stock == 1 else "unidades"
+                estado_detalle = f"Disponible ({stock} {unidades})" if stock else "Sin stock"
+                self.assertContains(self.client.get(rutas[1]), estado_detalle)
 
     def test_create_y_update_renderizan_limites_nativos(self):
         for ruta in self.rutas_crud():

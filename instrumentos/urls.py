@@ -2,6 +2,8 @@
 from django.urls import path
 from django.views.generic import TemplateView
 from . import views
+from . import galeria
+from . import mundo_musical
 
 app_name = "instrumentos"
 
@@ -18,26 +20,13 @@ urlpatterns = [
     ),
     path(
         "coleccion/",
-        TemplateView.as_view(
-            template_name="instrumentos/seccion_recepcion.html",
-            extra_context={
-                "titulo": "Instrumentos",
-                "descripcion": "El carrusel de instrumentos está en preparación.",
-            },
-        ),
+        galeria.categorias,
         name="coleccion",
     ),
-    path(
-        "mundo-musical/",
-        TemplateView.as_view(
-            template_name="instrumentos/seccion_recepcion.html",
-            extra_context={
-                "titulo": "Mundo musical",
-                "descripcion": "Próximamente: historia de la música, instrumentos, géneros y curiosidades.",
-            },
-        ),
-        name="mundo_musical",
-    ),
+    path("coleccion/<slug:categoria>/", galeria.exhibicion, name="coleccion_categoria"),
+    path("coleccion/instrumento/<int:pk>/", galeria.abrir_instrumento, name="coleccion_instrumento"),
+    path("mundo-musical/", mundo_musical.portada, name="mundo_musical"),
+    path("mundo-musical/<slug:slug>/", mundo_musical.leer, name="mundo_articulo"),
 
     # READ - Consultar instrumentos
     path(

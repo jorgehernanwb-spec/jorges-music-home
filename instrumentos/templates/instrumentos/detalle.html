@@ -2,46 +2,47 @@
 {% load instrumentos_formato %}
 
 {% block contenido %}
-<section class="seccion-formulario" aria-labelledby="titulo-instrumento">
-    <article class="panel-formulario panel-instrumento">
+<article class="ficha-premium" aria-labelledby="titulo-instrumento">
+    <div class="ficha-esquinas" aria-hidden="true"><span>❦</span><span>❦</span><span>❦</span><span>❦</span></div>
+    <header class="ficha-cabecera">
+        <span class="ficha-musica" aria-hidden="true">{% include 'instrumentos/ficha_icono.html' with icono='lira' only %}</span>
         <h1 id="titulo-instrumento">{{ instrumento.nombre }}</h1>
+        <span class="ficha-filete" aria-hidden="true">◆</span>
+    </header>
 
-        <dl class="ficha-instrumento">
-            <div>
-                <dt>Marca</dt>
-                <dd>{{ instrumento.marca }}</dd>
-            </div>
-            <div>
-                <dt>Categoría</dt>
-                <dd>{{ instrumento.get_categoria_display }}</dd>
-            </div>
-            <div>
-                <dt>Precio</dt>
-                <dd class="precio">{{ instrumento.precio|clp }} CLP</dd>
-            </div>
-            <div>
-                <dt>Stock</dt>
-                <dd>
-                    {% if instrumento.stock == 0 %}
-                        <span class="agotado">Sin stock</span>
-                    {% elif instrumento.stock <= 2 %}
-                        <span class="stock-bajo">Stock bajo</span>
-                    {% else %}
-                        <span class="disponible">Disponible</span>
-                    {% endif %}
-                    ({{ instrumento.stock }} unidades)
-                </dd>
-            </div>
-            <div class="ficha-descripcion">
-                <dt>Descripción</dt>
-                <dd>{{ instrumento.descripcion|default:"Sin descripción." }}</dd>
-            </div>
-        </dl>
-
-        <div class="botones-formulario">
-            <a class="boton" href="{% url 'instrumentos:editar' instrumento.pk %}">Editar instrumento</a>
-            <a class="boton-secundario" href="{% url 'instrumentos:lista' %}">Volver al catálogo</a>
+    <dl class="ficha-instrumento">
+        <div>
+            <dt><span class="ficha-icono-lateral">{% include 'instrumentos/ficha_icono.html' with icono='marca' only %}</span>Marca</dt>
+            <dd>{{ instrumento.marca }}</dd>
         </div>
-    </article>
-</section>
+        <div>
+            <dt><span class="ficha-icono-lateral">{% include 'instrumentos/ficha_icono.html' with icono='categoria' only %}</span>Categoría</dt>
+            <dd>{{ instrumento.get_categoria_display }}</dd>
+        </div>
+        <div class="ficha-precio">
+            <dt>Precio</dt>
+            <dd>{{ instrumento.precio|clp }} CLP</dd>
+        </div>
+    </dl>
+
+    <div class="ficha-disponibilidad">
+    {% if instrumento.stock %}
+        <p class="ficha-stock"><span aria-hidden="true">✓</span> Disponible ({{ instrumento.stock }} unidad{{ instrumento.stock|pluralize:"es" }})</p>
+    {% else %}
+        <p class="ficha-stock ficha-stock--agotado"><span aria-hidden="true">×</span> Sin stock</p>
+    {% endif %}
+    </div>
+
+    <section class="ficha-descripcion" aria-labelledby="titulo-descripcion">
+        <span class="ficha-icono-lateral">{% include 'instrumentos/ficha_icono.html' with icono='descripcion' only %}</span>
+        <h2 id="titulo-descripcion">Descripción</h2>
+        <p>{{ instrumento.descripcion|default:"Sin descripción." }}</p>
+    </section>
+
+    <nav class="ficha-acciones" aria-label="Acciones del instrumento">
+        <a href="{% url 'instrumentos:coleccion_instrumento' instrumento.pk %}">{% include 'instrumentos/ficha_icono.html' with icono='cubo' only %} Ver en 3D</a>
+        <a class="ficha-accion-principal" href="{% url 'instrumentos:editar' instrumento.pk %}">{% include 'instrumentos/ficha_icono.html' with icono='editar' only %} Editar instrumento</a>
+        <a href="{% url 'instrumentos:lista' %}">{% include 'instrumentos/ficha_icono.html' with icono='regreso' only %} Volver al catálogo</a>
+    </nav>
+</article>
 {% endblock %}

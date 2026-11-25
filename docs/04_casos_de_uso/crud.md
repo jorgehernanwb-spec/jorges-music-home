@@ -4,6 +4,10 @@
 
 El **operador del inventario** utiliza el navegador con Django y MariaDB disponibles y con el esquema migrado. Las rutas del inventario actual no requieren autenticación. Las operaciones de escritura se envían por POST con CSRF.
 
+La galería ofrece otro acceso de lectura a la ficha mediante el enlace de detalle. Desde allí se conservan las acciones y rutas de edición y confirmación de eliminación. El alta continúa disponible desde el inventario y la recepción. [Exploración de categorías](galeria.md)
+
+Cada sala consulta MariaDB al abrirse. Los cambios de marca, nombre, categoría, descripción, precio y stock aparecen al volver a consultar. Los registros eliminados dejan de aparecer. **Ver en 3D**, desde el listado o el detalle, abre el registro por su ID y sigue funcionando si cambia de categoría. Los agotados conservan la acción.
+
 ## CREATE · Registrar un instrumento
 
 - **Objetivo.** Incorporar un instrumento al catálogo.
@@ -23,6 +27,8 @@ El **operador del inventario** utiliza el navegador con Django y MariaDB disponi
 - **Flujos alternativos.** Si el catálogo está vacío, se muestra el aviso correspondiente. Si el identificador de una ficha no existe, Django responde con 404.
 - **Validaciones.** La ruta de detalle utiliza un identificador entero y la vista comprueba su existencia con `get_object_or_404()`.
 - **Resultado esperado.** Se muestra el contenido solicitado sin modificar registros.
+
+La misma plantilla de detalle presenta las cuatro categorías. Muestra marca, categoría y precio CLP en tres tarjetas, una insignia con el stock disponible o **Sin stock**, y la descripción. El Inventario conserva su indicador de stock bajo. Desde la ficha se puede abrir el visor 3D, editar el instrumento o volver al catálogo.
 
 ## UPDATE · Editar un instrumento
 

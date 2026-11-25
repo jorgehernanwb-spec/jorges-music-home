@@ -79,6 +79,7 @@
                         <td role="cell" class="inventario-celda-acciones">
                             <div class="inventario-acciones">
                                 <a href="{% url 'instrumentos:detalle' instrumento.pk %}" aria-label="Ver {{ instrumento.nombre }}">Ver</a>
+                                <a href="{% url 'instrumentos:coleccion_instrumento' instrumento.pk %}" aria-label="Ver en 3D {{ instrumento.nombre }} · {{ instrumento.get_marca_display }}">Ver en 3D</a>
                                 <a href="{% url 'instrumentos:editar' instrumento.pk %}" aria-label="Editar {{ instrumento.nombre }}">Editar</a>
                                 <a class="inventario-eliminar" href="{% url 'instrumentos:eliminar' instrumento.pk %}" aria-label="Eliminar {{ instrumento.nombre }}">Eliminar</a>
                             </div>
