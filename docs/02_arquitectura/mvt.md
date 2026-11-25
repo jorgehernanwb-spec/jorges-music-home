@@ -16,7 +16,10 @@
 
 | Ruta | Nombre | Comportamiento |
 | --- | --- | --- |
-| `/` | `inicio` | `TemplateView` muestra la fachada. El enlace de las puertas lleva a `/instrumentos/`. |
+| `/` | `inicio` | `TemplateView` muestra la fachada. El enlace de las puertas lleva a `/recepcion/`. |
+| `/recepcion/` | `recepcion` | Muestra la recepción y el menú principal. |
+| `/coleccion/` | `coleccion` | Entrada de Instrumentos, sección en preparación. |
+| `/mundo-musical/` | `mundo_musical` | Entrada de la sección educativa en preparación. |
 | `/instrumentos/` | `lista` | El GET muestra los instrumentos ordenados por nombre. |
 | `/instrumentos/nuevo/` | `crear` | El GET muestra el formulario vacío. El POST intenta crear el instrumento. |
 | `/instrumentos/<int:pk>/` | `detalle` | El GET muestra la ficha. Un identificador inexistente devuelve 404. |

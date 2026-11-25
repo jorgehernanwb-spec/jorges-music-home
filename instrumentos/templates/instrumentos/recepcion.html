@@ -1,0 +1,60 @@
+{% extends 'instrumentos/recepcion_base.html' %}
+{% load static %}
+
+{% block clase_escena %} recepcion--inmersiva{% endblock %}
+{% block clase_pagina %} pagina-inmersiva{% endblock %}
+
+{% block contenido %}
+<div class="recepcion-escena">
+    <img class="recepcion-foto" src="{% static 'instrumentos/img/recepcion-principal.png' %}"
+         width="1448" height="1086"
+         alt="Recepción de Jorge's Music Home con guitarras en exhibición, mostrador de madera y letrero iluminado.">
+    {% for guitarra in "123456" %}
+        <a class="recepcion-zona recepcion-guitarra recepcion-guitarra-{{ guitarra }}"
+           href="{% url 'instrumentos:coleccion' %}"
+           aria-label="Explorar instrumentos, guitarra {{ guitarra }} de 6">
+            <span class="recepcion-pista" aria-hidden="true">Explorar instrumentos</span>
+        </a>
+    {% endfor %}
+    <button class="recepcion-zona recepcion-computador" type="button"
+            aria-label="Abrir administración" aria-haspopup="dialog" aria-controls="menu-computador"
+            aria-expanded="false" data-recepcion-dialogo></button>
+    <button class="recepcion-zona recepcion-letrero" type="button" id="letrero-recepcion"
+            aria-label="Abrir Nuestra historia desde el letrero Jorge's" aria-haspopup="dialog"
+            aria-controls="menu-historia" aria-expanded="false" data-recepcion-dialogo></button>
+    <button class="recepcion-control recepcion-historia" type="button" aria-haspopup="dialog"
+            aria-controls="menu-historia" aria-expanded="false" data-recepcion-dialogo>
+        Nuestra historia
+    </button>
+    <a class="recepcion-control recepcion-salida" href="{% url 'instrumentos:inicio' %}">
+        {% include 'instrumentos/recepcion_icono.html' with icono='salida' only %}Salida
+    </a>
+</div>
+{% endblock %}
+
+{% block accesos %}{% endblock %}
+
+{% block dialogos %}
+<dialog class="recepcion-panel" id="menu-computador" aria-labelledby="titulo-computador">
+    <div class="recepcion-menu-cabecera">
+        <h2 id="titulo-computador">Administración</h2>
+        <form method="dialog"><button class="recepcion-control" type="submit" autofocus>Cerrar</button></form>
+    </div>
+    <nav class="recepcion-menu-enlaces" aria-label="Acciones de administración">
+        <a href="{% url 'instrumentos:lista' %}">{% include 'instrumentos/recepcion_icono.html' with icono='libro' only %}Inventario</a>
+        <a href="{% url 'instrumentos:crear' %}">{% include 'instrumentos/recepcion_icono.html' with icono='agregar' only %}Agregar instrumento</a>
+    </nav>
+</dialog>
+
+<dialog class="recepcion-panel" id="menu-historia" aria-labelledby="titulo-historia">
+    <div class="recepcion-menu-cabecera">
+        <h2 id="titulo-historia">Nuestra historia</h2>
+        <form method="dialog"><button class="recepcion-control" type="submit" autofocus>Cerrar</button></form>
+    </div>
+    <p>En Jorge's Music Home creemos que la música tiene el poder de inspirar, conectar personas y transformar momentos en recuerdos inolvidables.</p>
+    <p>Nuestra pasión por los instrumentos musicales nos impulsa a crear un espacio donde cada persona pueda descubrir nuevas posibilidades, expresar su creatividad y encontrar el sonido que la representa.</p>
+    <h3>Nuestro compromiso</h3>
+    <p>Nuestro compromiso es ofrecer instrumentos de calidad, una selección cuidadosamente presentada y una experiencia cercana para todos los amantes de la música.</p>
+    <p>Jorge's Music Home — Donde comienza tu próxima historia musical.</p>
+</dialog>
+{% endblock %}

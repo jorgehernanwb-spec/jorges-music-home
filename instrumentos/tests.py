@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, transaction
 from django.test import Client, SimpleTestCase, TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from .forms import InstrumentoForm
 from .models import Instrumento
@@ -15,19 +16,20 @@ class FachadaTests(SimpleTestCase):
         response = self.client.get(reverse("instrumentos:inicio"))
         self.assertTemplateUsed(response, "instrumentos/fachada.html")
         self.assertTemplateNotUsed(response, "instrumentos/base.html")
-        for etiqueta in ("<header", "<nav", "<footer", "<form", "<button"):
+        for etiqueta in ("<header", "<nav", "<form", "<button"):
             self.assertNotContains(response, etiqueta)
+        self.assertContains(response, '<footer class="pie-global">', count=1)
         self.assertContains(response, 'width="1774" height="887"')
         self.assertContains(response, "instrumentos/img/fachada-principal.png")
         self.assertContains(response, "instrumentos/css/fachada.css")
         self.assertContains(response, "instrumentos/js/fachada.js")
         self.assertNotContains(response, "instrumentos/js/validaciones.js")
 
-    def test_las_puertas_son_un_enlace_nativo_al_catalogo(self):
+    def test_las_puertas_son_un_enlace_nativo_a_la_recepcion(self):
         response = self.client.get(reverse("instrumentos:inicio"))
         enlace = re.search(r'<a class="fachada-puertas"[^>]*>', response.content.decode())
         self.assertIsNotNone(enlace)
-        self.assertIn(f'href="{reverse("instrumentos:lista")}"', enlace.group())
+        self.assertIn(f'href="{reverse("instrumentos:recepcion")}"', enlace.group())
         self.assertIn('aria-label="Entrar a la tienda"', enlace.group())
         self.assertNotIn("tabindex", enlace.group())
 
@@ -38,6 +40,62 @@ class FachadaTests(SimpleTestCase):
         self.assertContains(response, "instrumentos/js/validaciones.js")
         self.assertNotContains(response, "instrumentos/js/fachada.js")
         self.assertNotContains(response, "instrumentos/css/fachada.css")
+
+
+class RecepcionTests(SimpleTestCase):
+    def test_recepcion_usa_la_imagen_aprobada_y_tiene_menu_con_iconos(self):
+        response = self.client.get(reverse("instrumentos:recepcion"))
+        self.assertContains(response, "instrumentos/img/recepcion-principal.png")
+        self.assertContains(response, 'width="1448" height="1086"')
+        self.assertContains(response, 'aria-controls="menu-recepcion" aria-expanded="false"')
+        self.assertContains(response, 'method="dialog"')
+        self.assertContains(response, 'type="submit" autofocus')
+        self.assertNotContains(response, 'aria-label="Accesos rápidos"')
+        self.assertTemplateNotUsed(response, "instrumentos/base.html")
+        for ruta, etiqueta in (
+            ("recepcion", "Inicio"),
+            ("coleccion", "Instrumentos"),
+            ("lista", "Inventario"),
+            ("crear", "Agregar instrumento"),
+            ("mundo_musical", "Mundo musical"),
+        ):
+            actual = ' aria-current="page"' if ruta == "recepcion" else ""
+            self.assertRegex(
+                response.content.decode(),
+                rf'(?s)<a href="{reverse(f"instrumentos:{ruta}")}"{actual}>\s*<svg[^>]*>.*?</svg>\s*{etiqueta}</a>',
+            )
+
+    def test_recepcion_tiene_zonas_interactivas_paneles_y_salida(self):
+        response = self.client.get(reverse("instrumentos:recepcion"))
+        self.assertContains(response, 'aria-label="Explorar instrumentos, guitarra ', count=6)
+        self.assertContains(response, f'href="{reverse("instrumentos:coleccion")}"', count=8)
+        self.assertContains(response, 'id="letrero-recepcion"')
+        self.assertContains(response, 'aria-label="Abrir Nuestra historia desde el letrero Jorge\'s"')
+        self.assertContains(response, 'aria-controls="menu-historia"', count=2)
+        self.assertContains(response, 'id="menu-historia"', count=1)
+        self.assertContains(response, 'aria-controls="menu-computador"', count=1)
+        self.assertContains(response, 'id="menu-computador"', count=1)
+        self.assertNotContains(response, 'aria-hidden="true">Administración')
+        self.assertContains(response, "Nuestro compromiso")
+        self.assertContains(response, f'class="recepcion-control recepcion-salida" href="{reverse("instrumentos:inicio")}"')
+        escena = response.content.decode().split('<div class="recepcion-escena">', 1)[1].split("</div>", 1)[0]
+        self.assertIn("recepcion-historia", escena)
+        self.assertIn("recepcion-salida", escena)
+
+    def test_secciones_en_preparacion_son_distintas_y_marcan_la_opcion_activa(self):
+        for ruta, titulo in (("coleccion", "Instrumentos"), ("mundo_musical", "Mundo musical")):
+            with self.subTest(ruta=ruta):
+                destino = reverse(f"instrumentos:{ruta}")
+                response = self.client.get(destino)
+                self.assertContains(response, f"<h1>{titulo}</h1>", html=True)
+                self.assertRegex(
+                    response.content.decode(),
+                    rf'(?s)<a href="{destino}" aria-current="page">\s*<svg[^>]*>.*?</svg>\s*{titulo}</a>',
+                )
+                self.assertContains(
+                    response, f'<a class="recepcion-control" href="{reverse("instrumentos:recepcion")}">Inicio</a>',
+                    html=True,
+                )
 
 
 class InstrumentoCRUDTests(TestCase):
@@ -53,6 +111,19 @@ class InstrumentoCRUDTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.instrumento = Instrumento.objects.create(**cls.datos)
+
+    def test_footer_global_unico_y_con_el_ano_actual(self):
+        routes = [(name, ()) for name in ("inicio", "recepcion", "coleccion", "mundo_musical", "lista", "crear")]
+        routes += [(name, (self.instrumento.pk,)) for name in ("detalle", "editar", "eliminar")]
+        for name, args in routes:
+            with self.subTest(ruta=name):
+                response = self.client.get(reverse(f"instrumentos:{name}", args=args))
+                self.assertContains(response, "<footer", count=1)
+                self.assertContains(
+                    response,
+                    f"© {timezone.localdate().year} Jorge's Music Home · Todos los derechos reservados.",
+                    count=1,
+                )
 
     def test_el_alta_conserva_el_formulario_y_guarda(self):
         url = reverse("instrumentos:crear")

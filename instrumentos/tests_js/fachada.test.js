@@ -13,7 +13,7 @@ function iniciar(reduced = false) {
     const clases = new Set();
     const destinos = [];
     const enlace = {
-        href: "/instrumentos/",
+        href: "/recepcion/",
         addEventListener(tipo, fn) { click = fn; },
     };
     const escena = {
@@ -42,13 +42,13 @@ function iniciar(reduced = false) {
     };
 }
 
-test("la activación por teclado usa la transición y abre el catálogo", () => {
+test("la activación por teclado usa la transición y abre la recepción", () => {
     const demo = iniciar();
     assert.equal(demo.activar({ detail: 0 }), true);
     assert.ok(demo.clases.has("esta-entrando"));
     assert.equal(demo.programado().espera, 930);
     demo.programado().fn();
-    assert.deepEqual(demo.destinos, ["/instrumentos/"]);
+    assert.deepEqual(demo.destinos, ["/recepcion/"]);
     demo.restaurar();
     assert.equal(demo.clases.size, 0);
     assert.equal(demo.programado(), undefined);

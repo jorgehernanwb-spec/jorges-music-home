@@ -1,0 +1,28 @@
+.pagina-con-pie {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+.pagina-inventario {
+    grid-template-rows: auto 1fr auto;
+}
+
+.pagina-inmersiva {
+    height: 100vh;
+    height: 100dvh;
+    grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.pie-global {
+    padding: .33rem .75rem max(.33rem, env(safe-area-inset-bottom, 0px));
+    background: #1d1610;
+    color: #d9ba92;
+    text-align: center;
+    font: .75rem/1.4 system-ui, sans-serif;
+}
+
+.pie-global p {
+    margin: 0;
+}

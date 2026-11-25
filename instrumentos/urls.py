@@ -11,6 +11,33 @@ urlpatterns = [
         TemplateView.as_view(template_name="instrumentos/fachada.html"),
         name="inicio"
     ),
+    path(
+        "recepcion/",
+        TemplateView.as_view(template_name="instrumentos/recepcion.html"),
+        name="recepcion",
+    ),
+    path(
+        "coleccion/",
+        TemplateView.as_view(
+            template_name="instrumentos/seccion_recepcion.html",
+            extra_context={
+                "titulo": "Instrumentos",
+                "descripcion": "El carrusel de instrumentos está en preparación.",
+            },
+        ),
+        name="coleccion",
+    ),
+    path(
+        "mundo-musical/",
+        TemplateView.as_view(
+            template_name="instrumentos/seccion_recepcion.html",
+            extra_context={
+                "titulo": "Mundo musical",
+                "descripcion": "Próximamente: historia de la música, instrumentos, géneros y curiosidades.",
+            },
+        ),
+        name="mundo_musical",
+    ),
 
     # READ - Consultar instrumentos
     path(

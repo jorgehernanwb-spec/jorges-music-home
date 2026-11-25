@@ -6,8 +6,7 @@ body {
 .fachada {
     display: grid;
     place-items: center;
-    height: 100vh;
-    height: 100dvh;
+    container-type: size;
     overflow: hidden;
 }
 
@@ -18,8 +17,8 @@ body {
     --puertas-ancho: .2751;
     --puertas-alto: .5693;
     position: relative;
-    width: min(100%, 200vh);
-    width: min(100%, 200dvh);
+    width: min(100%, calc(200vh - 5rem));
+    width: min(100%, 200cqh);
 }
 
 .fachada-imagen {

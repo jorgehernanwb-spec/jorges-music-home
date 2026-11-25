@@ -9,15 +9,17 @@
 
     <link rel="stylesheet"
           href="{% static 'instrumentos/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'instrumentos/css/pie-global.css' %}">
 </head>
 
-<body>
+<body class="pagina-con-pie pagina-inventario">
     <header class="encabezado">
         <a href="{% url 'instrumentos:inicio' %}" class="marca">
             JORGE'S <span>MUSIC HOME</span>
         </a>
 
         <nav aria-label="Navegación principal">
+            <a href="{% url 'instrumentos:recepcion' %}">Recepción</a>
             <a href="{% url 'instrumentos:lista' %}">
                 Instrumentos
             </a>
@@ -40,9 +42,6 @@
         {% endblock %}
     </main>
 
-    <footer class="pie">
-        <p>JORGE'S MUSIC HOME · EST. 2026</p>
-        <p>Donde la música encuentra su hogar.</p>
-    </footer>
+    {% include 'instrumentos/pie_global.html' %}
 </body>
 </html>
