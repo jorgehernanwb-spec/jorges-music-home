@@ -129,6 +129,18 @@ class GaleriaCategoriasTests(SimpleTestCase):
 
 
 class GaleriaExhibicionTests(TestCase):
+    def test_las_cuatro_salas_tienen_sus_recursos_glb_locales(self):
+        for archivo in (
+            "solid-body-electric-guitar.glb", "four-string-bass-guitar.glb",
+            "88-key-keyboard-instrument.glb", "five-piece-drum-kit.glb",
+        ):
+            with self.subTest(archivo=archivo):
+                self.assertIsNotNone(finders.find(f"instrumentos/modelos/{archivo}"))
+        self.assertIsNotNone(finders.find("instrumentos/vendor/three-0.180.0/GLTFLoader.mjs"))
+        self.assertContains(
+            self.client.get("/coleccion/baterias/"), "Batería acústica representativa de la categoría.",
+        )
+
     def test_categorias_consultan_los_registros_en_mariadb_sin_modificarlos(self):
         before = list(Instrumento.objects.order_by("pk").values())
         for slug, clave in (

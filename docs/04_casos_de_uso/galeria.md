@@ -7,7 +7,7 @@
 | Acceso desde la recepción | El menú Instrumentos y las seis guitarras interactivas llevan a `/coleccion/`. |
 | Explorar categorías | Cuatro vitrinas con su imagen aprobada, el nombre de la categoría y el enlace «Explorar colección». |
 | Consultar una sala | Django muestra los registros actuales de su categoría y enlaza a las fichas. Baterías usa la clave interna `Percusion`. |
-| Manipular el prototipo | Cada sala permite girar su malla con arrastre, toque o flechas sobre el lienzo. La flotación puede pausarse y se desactiva con movimiento reducido. |
+| Manipular el modelo | Cada sala carga un GLB estático y permite girarlo con arrastre, toque o flechas sobre el lienzo. La flotación puede pausarse y se desactiva con movimiento reducido. |
 | Recorrer una sala | Las flechas laterales recorren todos los registros de forma circular. El modelo sale y entra desde lados opuestos y recupera la orientación inicial con el acabado de la nueva marca. |
 | Consultar especificaciones | Un diálogo muestra nombre, marca, categoría, modelo y descripción, precio CLP, stock y acabado de la selección. Escape, el botón Cerrar o un clic fuera devuelven el foco al botón de apertura. |
 | Continuidad de navegación | Los enlaces siguen accesibles con WebGL desactivado y en salas vacías. |
@@ -29,27 +29,18 @@ flowchart LR
     bajos --> carrusel
     teclados --> carrusel
     baterias --> carrusel
-    carrusel --> visor["Modelo WebGL o aviso accesible"]
+    carrusel --> visor["Modelo GLB o aviso accesible"]
     carrusel --> especificaciones["Diálogo de especificaciones"]
     especificaciones --> detalle["Ficha de inventario"]
 ```
 
-## Modelos y alcance futuro
+## Modelos de exhibición
 
-Las cuatro mallas son provisionales y se generan en el proyecto. No se encontraron recursos GLB o glTF en el repositorio.
-
-| Sala | Malla disponible |
-| --- | --- |
-| Guitarras | Eléctrica de seis cuerdas. |
-| Bajos | Eléctrico de cuatro cuerdas y mástil más largo. |
-| Teclados | Teclado digital con teclas, pantalla y controles. |
-| Baterías | Batería acústica con bombo, tambores, platillos y soportes. Representa la categoría, incluidos los registros de baterías electrónicas. |
-
-Los cuatro modelos fotorrealistas quedan pendientes.
+Guitarras usa una eléctrica de seis cuerdas, Bajos un bajo de cuatro cuerdas, Teclados un instrumento digital de 88 teclas y Baterías un conjunto acústico de cinco piezas. Cada GLB representa su categoría. La batería acústica también acompaña fichas de baterías electrónicas. [Procedencia, licencias y validación](../02_arquitectura/recursos_3d.md)
 
 ## Implementación del carrusel
 
-`galeria.py` ordena los registros por nombre e identificador y obtiene el acabado de `presentacion.py`. Las plantillas preparan el escenario compartido y una ficha HTML por registro. `galeria-carrusel.mjs` controla la posición, la transición y el diálogo. `galeria-visor.mjs` controla el giro y la flotación con el renderizador `galeria-webgl.mjs`. `modelos-galeria.mjs` define la malla y la cámara inicial por categoría. Los materiales marcados como pintados reciben el acabado y los demás conservan sus colores. El modelo comercial se muestra junto con la descripción porque ambos provienen del campo `descripcion`.
+`galeria.py` ordena los registros y obtiene el acabado de `presentacion.py`. `galeria-carrusel.mjs` controla la posición, la transición y el diálogo. `galeria-visor.mjs` controla giro y flotación. `galeria-glb.mjs` carga el archivo especificado por `modelos-glb.mjs`, calcula sus límites y aplica una escala uniforme que conserva las proporciones. El acabado se limita a la combinación de nodo y material configurada. La descripción sigue proporcionando el nombre comercial de la ficha.
 
 ## Revisión visual
 

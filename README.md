@@ -97,6 +97,6 @@ Django crea y retira un esquema de pruebas separado. Las pruebas JavaScript usan
 
 La rama `feature/galeria-3d` parte del inventario vintage (`00440612826423e47646b62173e16d4b2e956c13`). Integra primero ese inventario al preparar la integración de la galería con `main`.
 
-Desde **Instrumentos** en la recepción se accede a **Nuestra colección**. Las cuatro salas comparten un carrusel circular con registros actuales de MariaDB, giro independiente y diálogo de especificaciones. Cada categoría tiene una malla WebGL provisional y aplica el acabado de marca únicamente a las piezas pintadas. Los datos siguen disponibles si WebGL o JavaScript fallan. [Rutas, alcance de los modelos y revisión visual](docs/04_casos_de_uso/galeria.md)
+Desde **Instrumentos** en la recepción se accede a **Nuestra colección**. Las cuatro salas comparten un carrusel circular con registros actuales de MariaDB, giro independiente y diálogo de especificaciones. Cada sala carga un GLB de Innerscene mediante Three.js 0.180.0 servido localmente y aplica el acabado de marca únicamente a las piezas identificadas. Los datos siguen disponibles si falla el recurso, WebGL 2 o JavaScript. [Galería y revisión visual](docs/04_casos_de_uso/galeria.md) · [Modelos, licencias y validación](docs/02_arquitectura/recursos_3d.md)
 
 Ejecuta la demostración en `127.0.0.1` y usa una base con datos de ejemplo. Esta versión no está preparada para despliegue público. El servidor de desarrollo, el modo de depuración y las acciones de inventario sin inicio de sesión están destinados a la demostración local.

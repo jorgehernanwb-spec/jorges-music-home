@@ -1,6 +1,5 @@
-import {crearRenderizador} from "./galeria-webgl.mjs";
-import {modelos} from "./modelos-galeria.mjs";
-const acabadoInicial = [.73, .29, .13];
+import {crearRenderizador} from "./galeria-glb.mjs";
+import {modelos} from "./modelos-glb.mjs";
 
 export function iniciarVisor(pagina, entorno = window, acabado = "", categoria = "guitarras") {
     const canvas = pagina.querySelector("[data-visor]");
@@ -12,19 +11,27 @@ export function iniciarVisor(pagina, entorno = window, acabado = "", categoria =
     const modelo = modelos[categoria];
     const orientacionInicial = modelo?.orientacion ?? [0, 0];
     let [horizontal, vertical] = orientacionInicial;
-    let color = colorDelAcabado(acabado);
+    let color = acabado;
     let pausa = false;
     let animacion = 0;
     let puntero = null;
-    let renderizar;
+    let renderizador;
+    let observador;
+
+    function detener() {
+        entorno.cancelAnimationFrame(animacion);
+        movimientoReducido.removeEventListener?.("change", actualizarFlotacion);
+        observador?.disconnect();
+        renderizador?.cerrar();
+    }
 
     function mostrarAlternativa() {
-        entorno.cancelAnimationFrame(animacion);
-        animacion = 0;
+        detener();
         const activo = canvas.ownerDocument?.activeElement;
         const recuperarFoco = activo === canvas || controles.contains(activo);
         canvas.hidden = controles.hidden = true;
         if (nota) nota.hidden = true;
+        alternativo.textContent = "Visor 3D no disponible. Puedes consultar las especificaciones.";
         alternativo.hidden = false;
         if (recuperarFoco) {
             alternativo.tabIndex = -1;
@@ -38,7 +45,7 @@ export function iniciarVisor(pagina, entorno = window, acabado = "", categoria =
 
     function dibujar(tiempo = 0) {
         if (!canvas.hidden) {
-            renderizar(horizontal, vertical, flota() ? Math.sin(tiempo / 1100) * .045 : 0, color);
+            renderizador.render(horizontal, vertical, flota() ? Math.sin(tiempo / 1100) * .032 : 0, color);
         }
     }
 
@@ -63,17 +70,27 @@ export function iniciarVisor(pagina, entorno = window, acabado = "", categoria =
 
     try {
         if (!modelo) throw new Error("Modelo no disponible");
-        renderizar = crearRenderizador(canvas, modelo);
-        canvas.hidden = controles.hidden = false;
-        if (nota) nota.hidden = false;
-        dibujar();
-        alternativo.hidden = true;
+        renderizador = crearRenderizador(canvas, modelo);
     } catch {
         mostrarAlternativa();
         return false;
     }
 
+    alternativo.textContent = "Cargando el modelo 3D…";
+    renderizador.listo.then((cargado) => {
+        if (!cargado) return;
+        canvas.hidden = controles.hidden = false;
+        if (nota) nota.hidden = false;
+        dibujar();
+        alternativo.hidden = true;
+        observador = new entorno.ResizeObserver(() => { if (!flota()) dibujar(); });
+        observador.observe(canvas);
+        movimientoReducido.addEventListener("change", actualizarFlotacion);
+        actualizarFlotacion();
+    }).catch(mostrarAlternativa);
+
     canvas.addEventListener("webglcontextlost", mostrarAlternativa);
+    entorno.addEventListener("pagehide", (evento) => { if (!evento.persisted) detener(); });
     canvas.addEventListener("pointerdown", (evento) => {
         if (!evento.isPrimary || evento.button !== 0) return;
         canvas.setPointerCapture(evento.pointerId);
@@ -102,19 +119,10 @@ export function iniciarVisor(pagina, entorno = window, acabado = "", categoria =
         pausa = !pausa;
         actualizarFlotacion();
     });
-    movimientoReducido.addEventListener("change", actualizarFlotacion);
-    new entorno.ResizeObserver(() => { if (!flota()) dibujar(); }).observe(canvas);
-    actualizarFlotacion();
     return {
         seleccionar(acabado) {
-            color = colorDelAcabado(acabado);
+            color = acabado;
             centrar();
         },
     };
-}
-
-export function colorDelAcabado(hex) {
-    return /^#[\da-f]{6}$/i.test(hex)
-        ? hex.slice(1).match(/../g).map((canal) => parseInt(canal, 16) / 255)
-        : acabadoInicial;
 }

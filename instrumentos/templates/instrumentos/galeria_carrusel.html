@@ -21,7 +21,7 @@
                 <button type="button" data-flotacion aria-pressed="false">Pausar flotación</button>
             </div>
         </details>
-        <p id="ayuda-visor" class="galeria-nota" data-visor-nota hidden>Modelo provisional. Arrastra o enfoca el modelo y usa las flechas para girarlo.</p>
+        <p id="ayuda-visor" class="galeria-nota" data-visor-nota hidden>{% if categoria == "baterias" %}Batería acústica representativa de la categoría. {% endif %}Arrastra o enfoca el modelo y usa las flechas para girarlo.</p>
     </div>
     <dialog class="galeria-dialogo" data-dialogo aria-label="Especificaciones">
         <div data-ficha></div>

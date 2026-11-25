@@ -9,7 +9,7 @@
         <div>
             <dt>Acabado</dt>
             <dd>{% if color %}<span class="galeria-muestra" style="--acabado: {{ color }}" aria-hidden="true"></span>
-                {{ instrumento.get_marca_display }} ({{ color }}){% else %}Acabado del prototipo{% endif %}</dd>
+                {{ instrumento.get_marca_display }} ({{ color }}){% else %}Acabado original del modelo{% endif %}</dd>
         </div>
         <div class="galeria-descripcion">
             <dt>Modelo y descripción</dt><dd>{{ instrumento.descripcion|default:"Sin descripción." }}</dd>

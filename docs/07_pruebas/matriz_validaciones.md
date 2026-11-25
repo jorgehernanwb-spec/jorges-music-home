@@ -24,9 +24,9 @@ Las ocho pruebas de JMH-001 siguen cubriendo creación, consulta, 404, edición 
 | --- | --- |
 | Acceso y cuatro vitrinas | Django comprueba los accesos de recepción, destinos, nombres, PNG disponibles y textos de acción. |
 | Consulta sin cambios | Django compara los registros antes y después y verifica las claves internas, las salas vacías y el 404. |
-| Visor y alternativa | Node comprueba geometría con volumen, normales y materiales, además del estado sin WebGL. Django comprueba el aviso y la tabla de marcas. |
+| Visor y alternativa | Node comprueba que GLTFLoader lea los cuatro archivos y asocie sus texturas, que el modelo quede centrado y que el aviso aparezca sin WebGL 2. Django comprueba la ficha y la tabla de marcas. |
 | Carrusel circular y transición | Node comprueba cinco registros, retorno circular, desplazamiento y movimiento reducido. |
 | Especificaciones y estados límite | Django comprueba datos reales, acabados, precio CLP y salas con cero o un registro. Node comprueba la sincronización con la selección, el cierre por clic exterior y el retorno de foco. |
-| Cuatro salas y cambios del CRUD | Django comprueba las cuatro categorías y que agregar un quinto registro, editar su marca y eliminarlo se refleje en su sala. Node comprueba que las cuatro mallas tengan volumen y materiales con y sin acabado de marca. |
+| Cuatro salas y cambios del CRUD | Django comprueba las cuatro categorías y que agregar un quinto registro, editar su marca y eliminarlo se refleje en su sala. Node verifica los cinco acabados únicamente en los nodos autorizados. Khronos glTF Validator revisa la conformidad de los cuatro GLB. |
 
 La revisión de distribución en escritorio y móvil, de foco visible y de rotación renderizada se realiza siguiendo el [caso de uso de la galería](../04_casos_de_uso/galeria.md).

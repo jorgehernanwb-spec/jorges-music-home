@@ -7,13 +7,13 @@ flowchart LR
     subgraph cliente["Navegador"]
         navegador["Interfaz HTML y CSS"]
         js["validaciones.js"]
-        webgl["Visor WebGL compartido"]
-        geometria["Configuración y mallas por categoría"]
+        webgl["Visor Three.js y GLTFLoader"]
+        geometria["GLB estático por categoría"]
         carrusel["Carrusel y diálogo de especificaciones"]
         js -->|Controla los campos| navegador
         webgl -->|Dibuja y gira el prototipo| navegador
         carrusel -->|Aplica acabado del registro| webgl
-        geometria -->|Proporciona la malla base| webgl
+        geometria -->|Proporciona geometría y materiales| webgl
         carrusel -->|Presenta la ficha seleccionada| navegador
     end
     subgraph django["Aplicación Django"]

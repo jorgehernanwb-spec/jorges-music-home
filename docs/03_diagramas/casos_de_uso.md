@@ -8,7 +8,7 @@ flowchart LR
     subgraph inventario["JORGE'S MUSIC HOME"]
         galeria(["Explorar categorías"])
         sala(["Consultar instrumentos de una categoría"])
-        girar(["Girar el modelo 3D provisional"])
+        girar(["Girar el modelo 3D de la categoría"])
         alternar(["Recorrer instrumentos de la sala"])
         especificaciones(["Ver especificaciones de la selección"])
         catalogo(["Consultar inventario"])
@@ -31,7 +31,7 @@ flowchart LR
     actor --- eliminar
 ```
 
-La exploración abre cuatro salas de solo lectura. Cada una permite recorrer sus registros y girar su modelo provisional cuando WebGL está disponible. El vínculo punteado indica que el borrado requiere confirmación. [Casos de uso del inventario](../04_casos_de_uso/crud.md) · [Casos de uso de la galería](../04_casos_de_uso/galeria.md)
+La exploración abre cuatro salas de solo lectura. Cada una permite recorrer sus registros y girar su GLB cuando está disponible. El vínculo punteado indica que el borrado requiere confirmación. [Casos de uso del inventario](../04_casos_de_uso/crud.md) · [Casos de uso de la galería](../04_casos_de_uso/galeria.md)
 
 ## Referencias
 
