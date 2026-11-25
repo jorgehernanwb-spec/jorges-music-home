@@ -8,7 +8,7 @@
 | --- | --- |
 | Modelo | `Instrumento` define los campos persistentes, las opciones de marca y categoría, los validadores y las restricciones. El ORM traduce operaciones sobre instancias y consultas a SQL. |
 | Vista | Las funciones de `views.py` coordinan la solicitud, la consulta por identificador, el formulario, los mensajes y la respuesta. |
-| Plantilla | Los archivos HTML heredan de `base.html` y presentan el catálogo, la ficha, los formularios y la confirmación de borrado. Alta y edición incluyen el mismo fragmento de campos. |
+| Plantilla | Las páginas del inventario heredan de `base.html`. Alta y edición incluyen el mismo fragmento de campos. La fachada usa una plantilla independiente con sus propios estilos y JavaScript. |
 | Formulario | `InstrumentoForm` es el `ModelForm` compartido por alta y edición. Convierte los datos recibidos, valida campos y vincula el resultado al modelo. |
 | URLs | La configuración del proyecto incluye las rutas de la aplicación. Cada ruta CRUD tiene un nombre dentro del espacio `instrumentos`. |
 
@@ -16,7 +16,7 @@
 
 | Ruta | Nombre | Comportamiento |
 | --- | --- | --- |
-| `/` | `inicio` | Redirige temporalmente al catálogo. |
+| `/` | `inicio` | `TemplateView` muestra la fachada. El enlace de las puertas lleva a `/instrumentos/`. |
 | `/instrumentos/` | `lista` | El GET muestra los instrumentos ordenados por nombre. |
 | `/instrumentos/nuevo/` | `crear` | El GET muestra el formulario vacío. El POST intenta crear el instrumento. |
 | `/instrumentos/<int:pk>/` | `detalle` | El GET muestra la ficha. Un identificador inexistente devuelve 404. |

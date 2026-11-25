@@ -10,6 +10,36 @@ from .models import Instrumento
 from .validaciones import analizar_precio
 
 
+class FachadaTests(SimpleTestCase):
+    def test_inicio_muestra_solo_la_fachada_con_la_proporcion_original(self):
+        response = self.client.get(reverse("instrumentos:inicio"))
+        self.assertTemplateUsed(response, "instrumentos/fachada.html")
+        self.assertTemplateNotUsed(response, "instrumentos/base.html")
+        for etiqueta in ("<header", "<nav", "<footer", "<form", "<button"):
+            self.assertNotContains(response, etiqueta)
+        self.assertContains(response, 'width="1774" height="887"')
+        self.assertContains(response, "instrumentos/img/fachada-principal.png")
+        self.assertContains(response, "instrumentos/css/fachada.css")
+        self.assertContains(response, "instrumentos/js/fachada.js")
+        self.assertNotContains(response, "instrumentos/js/validaciones.js")
+
+    def test_las_puertas_son_un_enlace_nativo_al_catalogo(self):
+        response = self.client.get(reverse("instrumentos:inicio"))
+        enlace = re.search(r'<a class="fachada-puertas"[^>]*>', response.content.decode())
+        self.assertIsNotNone(enlace)
+        self.assertIn(f'href="{reverse("instrumentos:lista")}"', enlace.group())
+        self.assertIn('aria-label="Entrar a la tienda"', enlace.group())
+        self.assertNotIn("tabindex", enlace.group())
+
+    def test_el_formulario_conserva_navegacion_y_validaciones_propias(self):
+        response = self.client.get(reverse("instrumentos:crear"))
+        self.assertTemplateUsed(response, "instrumentos/base.html")
+        self.assertContains(response, '<nav aria-label="Navegación principal">')
+        self.assertContains(response, "instrumentos/js/validaciones.js")
+        self.assertNotContains(response, "instrumentos/js/fachada.js")
+        self.assertNotContains(response, "instrumentos/css/fachada.css")
+
+
 class InstrumentoCRUDTests(TestCase):
     datos = {
         "nombre": "Bajo Precision",

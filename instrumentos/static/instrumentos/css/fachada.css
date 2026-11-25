@@ -1,0 +1,112 @@
+body {
+    margin: 0;
+    background: #151210;
+}
+
+.fachada {
+    display: grid;
+    place-items: center;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+}
+
+.fachada-escena {
+    /* Límites de las puertas, como fracción del PNG completo. */
+    --puertas-x: .3653;
+    --puertas-y: .3044;
+    --puertas-ancho: .2751;
+    --puertas-alto: .5693;
+    position: relative;
+    width: min(100%, 200vh);
+    width: min(100%, 200dvh);
+}
+
+.fachada-imagen {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.fachada-puertas {
+    position: absolute;
+    left: calc(100% * var(--puertas-x));
+    top: calc(100% * var(--puertas-y));
+    width: calc(100% * var(--puertas-ancho));
+    height: calc(100% * var(--puertas-alto));
+    overflow: hidden;
+    cursor: pointer;
+    touch-action: manipulation;
+    --apertura: 0%;
+    --marco-ancho: max(2px, 2.2%);
+    --marcos-visibles: hidden;
+    --espera-marcos: 480ms;
+    --duracion-apertura: 480ms;
+    box-shadow: inset 0 0 0 1px #ffcf842b;
+    transition: box-shadow 300ms ease;
+}
+
+.fachada-puertas:focus-visible {
+    outline: 3px solid #fff0d5;
+    outline-offset: -4px;
+}
+
+.fachada-interior,
+.fachada-hoja {
+    position: absolute;
+    inset-block: 0;
+    pointer-events: none;
+}
+
+.fachada-interior {
+    inset-inline: 0;
+    background: url("../img/recepcion_fija_sin_marcos.png") center / cover no-repeat;
+    /* La máscara revela una imagen fija, alineada con el hueco del PNG original. */
+    clip-path: inset(0 calc(50% - var(--apertura)));
+    transition: clip-path var(--duracion-apertura) ease;
+}
+
+.fachada-hoja {
+    width: var(--marco-ancho);
+    background: linear-gradient(90deg, #f1cf9326, #c99f611c 38%, #0d0b09 48%, #181310 86%, #a17c55aa);
+    visibility: var(--marcos-visibles);
+    transition:
+        left var(--duracion-apertura) ease,
+        right var(--duracion-apertura) ease,
+        visibility 0s var(--espera-marcos);
+}
+
+.fachada-hoja-izquierda {
+    left: calc(50% - var(--apertura) - var(--marco-ancho));
+}
+
+.fachada-hoja-derecha {
+    right: calc(50% - var(--apertura) - var(--marco-ancho));
+    background: linear-gradient(270deg, #f1cf9326, #c99f611c 38%, #0d0b09 48%, #181310 86%, #a17c55aa);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .fachada-puertas:hover {
+        --apertura: 25%;
+        --marcos-visibles: visible;
+        --espera-marcos: 0s;
+        box-shadow: inset 0 0 0 1px #ffcf8470, 0 0 10px #ffbf4d33;
+    }
+}
+
+.esta-entrando .fachada-puertas {
+    --apertura: 50%;
+    --marcos-visibles: visible;
+    --espera-marcos: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fachada-puertas {
+        transition: none;
+    }
+
+    .fachada-interior,
+    .fachada-hoja {
+        display: none;
+    }
+}
