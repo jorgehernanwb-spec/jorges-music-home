@@ -11,7 +11,7 @@ Catálogo e inventario web de instrumentos musicales. El proyecto permite regist
 
 ## Instalación en Windows
 
-Para una instalación independiente, clona el repositorio con una cuenta autorizada y cambia a la rama o al commit indicado para la entrega antes de ejecutar los comandos. Configura una base vacía propia y otra distinta para las pruebas de Django. [Mapa de navegación](docs/03_diagramas/navegacion.md) · [Evidencias de la evaluación](docs/07_pruebas/trazabilidad_inacap.md)
+Para una instalación independiente, clona el repositorio y usa la rama `main`, que contiene la versión final integrada. Configura una base vacía propia y otra distinta para las pruebas de Django. [Mapa de navegación](docs/03_diagramas/navegacion.md) · [Evidencias de la evaluación](docs/07_pruebas/trazabilidad_inacap.md)
 
 Abre PowerShell en la carpeta que contiene `manage.py`. Instala Python 3.12 desde su distribuidor oficial y ejecuta:
 
@@ -98,7 +98,7 @@ Django crea y retira un esquema de pruebas separado. Las pruebas JavaScript usan
 
 ## Uso local y académico
 
-La rama `feature/galeria-3d` parte del inventario vintage (`00440612826423e47646b62173e16d4b2e956c13`). Integra primero ese inventario al preparar la integración de la galería con `main`.
+La versión final en `main` reúne la fachada interactiva, la recepción, el inventario con búsqueda y filtros, el CRUD de instrumentos, las fichas premium y la colección 3D. Desde la recepción también se puede abrir el diálogo Nuestra historia y acceder a los doce artículos educativos de Mundo Musical.
 
 Desde **Instrumentos** en la recepción se accede a **Nuestra colección**. Las cuatro salas comparten un carrusel circular con registros actuales de MariaDB, giro independiente y diálogo de especificaciones. Cada sala carga un GLB de Innerscene mediante Three.js 0.180.0 servido localmente y aplica el acabado de marca únicamente a las piezas identificadas. Los datos siguen disponibles si falla el recurso, WebGL 2 o JavaScript. [Galería y revisión visual](docs/04_casos_de_uso/galeria.md) · [Modelos, licencias y validación](docs/02_arquitectura/recursos_3d.md)
 
@@ -107,3 +107,7 @@ En el Inventario y su ficha de detalle, **Ver en 3D** abre el registro exacto me
 Ejecuta la demostración en `127.0.0.1` y usa una base con datos de ejemplo. Esta versión no está preparada para despliegue público. El servidor de desarrollo, el modo de depuración y las acciones de inventario sin inicio de sesión están destinados a la demostración local.
 
 Django 5.0.14 se conserva para la evaluación. La serie 5.0 terminó el soporte extendido el 2 de abril de 2025. Después de la evaluación, Django 5.2 LTS es una opción compatible con Python 3.12 que debe verificarse con MariaDB y las pruebas del proyecto antes de adoptarla. [Versiones con soporte](https://www.djangoproject.com/download/#supported-versions)
+
+## Créditos y recursos
+
+Las imágenes de la interfaz y las ilustraciones de Mundo Musical se generaron para el proyecto con herramientas de imágenes de OpenAI. Los modelos de Innerscene se distribuyen bajo CC0 y Three.js conserva su aviso MIT. El código propio carece de una licencia abierta general. [Créditos y condiciones de uso](docs/02_arquitectura/creditos_recursos.md)
