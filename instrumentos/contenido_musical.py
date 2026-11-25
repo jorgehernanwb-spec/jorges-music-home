@@ -168,7 +168,7 @@ ARTICULOS = {articulo.slug: articulo for articulo in (
             )),
         ),
         "Su historia muestra cómo una comunidad puede transformar herramientas de reproducción en herramientas de creación.",
-        (("Museo Nacional de Historia Estadounidense · El hip-hop en el Smithsonian", "https://americanhistory.si.edu/press/releases/hip-hop-comes-smithsonian"),),
+        (("Senado de Estados Unidos · Resolución sobre el Día del Hip-hop", "https://www.govinfo.gov/content/pkg/BILLS-117sres331ats/pdf/BILLS-117sres331ats.pdf"),),
     ),
     Articulo(
         "walkman", TECNOLOGIA, "Cuando la música se volvió portátil — 1979",

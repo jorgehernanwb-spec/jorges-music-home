@@ -11,6 +11,8 @@ Catálogo e inventario web de instrumentos musicales. El proyecto permite regist
 
 ## Instalación en Windows
 
+Para una instalación independiente, clona el repositorio con una cuenta autorizada y cambia a la rama o al commit indicado para la entrega antes de ejecutar los comandos. Configura una base vacía propia y otra distinta para las pruebas de Django. [Mapa de navegación](docs/03_diagramas/navegacion.md) · [Evidencias de la evaluación](docs/07_pruebas/trazabilidad_inacap.md)
+
 Abre PowerShell en la carpeta que contiene `manage.py`. Instala Python 3.12 desde su distribuidor oficial y ejecuta:
 
 ```powershell
@@ -103,3 +105,5 @@ Desde **Instrumentos** en la recepción se accede a **Nuestra colección**. Las 
 En el Inventario y su ficha de detalle, **Ver en 3D** abre el registro exacto mediante `/coleccion/instrumento/<id>/`. La URL resuelve la categoría actual, aunque el instrumento cambie de sala. Los registros agotados siguen visibles y muestran **Sin stock**.
 
 Ejecuta la demostración en `127.0.0.1` y usa una base con datos de ejemplo. Esta versión no está preparada para despliegue público. El servidor de desarrollo, el modo de depuración y las acciones de inventario sin inicio de sesión están destinados a la demostración local.
+
+Django 5.0.14 se conserva para la evaluación. La serie 5.0 terminó el soporte extendido el 2 de abril de 2025. Después de la evaluación, Django 5.2 LTS es una opción compatible con Python 3.12 que debe verificarse con MariaDB y las pruebas del proyecto antes de adoptarla. [Versiones con soporte](https://www.djangoproject.com/download/#supported-versions)
